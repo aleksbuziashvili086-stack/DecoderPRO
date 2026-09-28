@@ -1,0 +1,7 @@
+com.alekss.toolkit.app-pngs-0 /data/data/com.termux/files/home/DecoderPRO/app/build/generated/res/pngs/debug
+com.alekss.toolkit.app-resValues-1 /data/data/com.termux/files/home/DecoderPRO/app/build/generated/res/resValues/debug
+com.alekss.toolkit.app-packageDebugResources-2 /data/data/com.termux/files/home/DecoderPRO/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
+com.alekss.toolkit.app-packageDebugResources-3 /data/data/com.termux/files/home/DecoderPRO/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
+com.alekss.toolkit.app-merged_res-4 /data/data/com.termux/files/home/DecoderPRO/app/build/intermediates/merged_res/debug
+com.alekss.toolkit.app-debug-5 /data/data/com.termux/files/home/DecoderPRO/app/src/debug/res
+com.alekss.toolkit.app-main-6 /data/data/com.termux/files/home/DecoderPRO/app/src/main/res

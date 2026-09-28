@@ -1,0 +1,74 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.alekss.toolkit"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="34" />
+10
+11    <!-- ფაილების წაკითხვის უფლება -->
+12    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+12-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:6:5-80
+12-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:6:22-77
+13    <uses-permission
+13-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:7:5-8:38
+14        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+14-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:7:22-78
+15        android:maxSdkVersion="28" />
+15-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:8:9-35
+16    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+16-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:9:5-10:40
+16-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:9:22-79
+17
+18    <application
+18-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:12:5-38:19
+19        android:allowBackup="true"
+19-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:13:9-35
+20        android:debuggable="true"
+21        android:extractNativeLibs="false"
+22        android:icon="@mipmap/ic_launcher"
+22-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:14:9-43
+23        android:label="@string/app_name"
+23-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:15:9-41
+24        android:requestLegacyExternalStorage="true"
+24-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:19:9-52
+25        android:roundIcon="@mipmap/ic_launcher"
+25-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:16:9-48
+26        android:supportsRtl="true"
+26-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:17:9-35
+27        android:theme="@style/Theme.DecoderPRO" >
+27-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:18:9-48
+28
+29        <!-- Splash Screen (პირველი ეკრანი) -->
+30        <activity
+30-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:23:9-31:20
+31            android:name="com.alekss.toolkit.SplashActivity"
+31-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:24:13-43
+32            android:exported="true"
+32-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:25:13-36
+33            android:theme="@style/Theme.DecoderPRO.Splash" >
+33-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:26:13-59
+34            <intent-filter>
+34-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:27:13-30:29
+35                <action android:name="android.intent.action.MAIN" />
+35-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:28:17-69
+35-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:28:25-66
+36
+37                <category android:name="android.intent.category.LAUNCHER" />
+37-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:29:17-77
+37-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:29:27-74
+38            </intent-filter>
+39        </activity>
+40
+41        <!-- მთავარი ეკრანი -->
+42        <activity
+42-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:34:9-36:40
+43            android:name="com.alekss.toolkit.HomeActivity"
+43-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:35:13-41
+44            android:exported="false" />
+44-->/data/data/com.termux/files/home/DecoderPRO/app/src/main/AndroidManifest.xml:36:13-37
+45    </application>
+46
+47</manifest>

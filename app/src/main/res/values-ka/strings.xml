@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">დეკოდერი PRO</string>
+    <string name="splash_subtitle">ალექსის ხელსაწყოები</string>
+    <string name="splash_loading">იტვირთება…</string>
+
+    <!-- Bottom Nav -->
+    <string name="nav_home">მთავარი</string>
+    <string name="nav_analyze">ანალიზი</string>
+    <string name="nav_tools">ხელსაწყოები</string>
+    <string name="nav_files">ფაილები</string>
+    <string name="nav_game_lab">თამაშები</string>
+
+    <!-- Home -->
+    <string name="home_title">დეკოდერი PRO</string>
+    <string name="decoder_pro_title">დეკოდერი PRO</string>
+    <string name="decoder_pro_desc">ფაილის და კოდის ანალიზატორი</string>
+    <string name="game_lab_title">თამაშების ლაბი</string>
+    <string name="game_lab_desc">APK და თამაშის ანალიზატორი</string>
+    <string name="recent_files">ბოლო ფაილები</string>
+    <string name="see_all">ყველა</string>
+
+    <!-- Modules -->
+    <string name="module_decoder">დეკოდერი</string>
+    <string name="module_decoder_desc">HEX / Base64 / URL</string>
+    <string name="module_hash">ჰეშირება</string>
+    <string name="module_hash_desc">MD5 / SHA-256</string>
+    <string name="module_cipher">შიფრები</string>
+    <string name="module_cipher_desc">XOR / AES / Caesar</string>
+    <string name="module_entropy">ენტროპია</string>
+    <string name="module_entropy_desc">ენტროპიის ანალიზი</string>
+    <string name="module_file_analysis">ფაილის ანალიზი</string>
+    <string name="module_file_analysis_desc">ღრმა ანალიზი</string>
+    <string name="module_hex_viewer">HEX ხედი</string>
+    <string name="module_hex_viewer_desc">HEX viewer / editor</string>
+    <string name="module_strings">სტრინგები</string>
+    <string name="module_strings_desc">სტრინგების ამოღება</string>
+    <string name="module_apk">APK ექსპლორერი</string>
+    <string name="module_apk_desc">APK / ZIP ექსპლორერი</string>
+    <string name="module_manifest">მანიფესტი</string>
+    <string name="module_manifest_desc">AndroidManifest</string>
+    <string name="module_dex">DEX ჰედერი</string>
+    <string name="module_dex_desc">DEX ანალიზი</string>
+    <string name="module_assets">რესურსები</string>
+    <string name="module_assets_desc">Assets ექსპლორერი</string>
+    <string name="module_so">Native .so</string>
+    <string name="module_so_desc">Native ბიბლიოთეკები</string>
+
+    <!-- Actions -->
+    <string name="action_decode">დეკოდირება</string>
+    <string name="action_encode">კოდირება</string>
+    <string name="action_copy">კოპირება</string>
+    <string name="action_paste">ჩასმა</string>
+    <string name="action_save">შენახვა</string>
+    <string name="action_share">გაზიარება</string>
+    <string name="action_select_file">ფაილის არჩევა</string>
+    <string name="action_analyze">ანალიზი</string>
+    <string name="action_settings">პარამეტრები</string>
+    <string name="action_about">შესახებ</string>
+
+    <!-- Input/Output -->
+    <string name="input_hint">შეიყვანე ტექსტი ან მონაცემები…</string>
+    <string name="output_hint">შედეგი გამოჩნდება აქ…</string>
+</resources>
