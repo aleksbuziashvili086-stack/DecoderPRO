@@ -1,56 +1,72 @@
 package com.alekss.toolkit;
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import com.alekss.toolkit.adapters.ModuleAdapter;
-import java.util.ArrayList;
-import java.util.List;
 
-public class HomeActivity extends AppCompatActivity {
-
+public class HomeActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        RecyclerView recyclerView = findViewById(R.id.modules_recycler);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        LinearLayout container = findViewById(R.id.modules_container);
 
-        // მოდულების სია
-        List<ModuleAdapter.Module> modules = new ArrayList<>();
-        modules.add(new ModuleAdapter.Module(
-            "decoder", "🔐", R.string.module_decoder, R.string.module_decoder_desc));
-        modules.add(new ModuleAdapter.Module(
-            "hash", "#️⃣", R.string.module_hash, R.string.module_hash_desc));
-        modules.add(new ModuleAdapter.Module(
-            "cipher", "🔒", R.string.module_cipher, R.string.module_cipher_desc));
-        modules.add(new ModuleAdapter.Module(
-            "entropy", "📊", R.string.module_entropy, R.string.module_entropy_desc));
-        modules.add(new ModuleAdapter.Module(
-            "file_analysis", "🔬", R.string.module_file_analysis, R.string.module_file_analysis_desc));
-        modules.add(new ModuleAdapter.Module(
-            "hex_viewer", "🔢", R.string.module_hex_viewer, R.string.module_hex_viewer_desc));
-        modules.add(new ModuleAdapter.Module(
-            "strings", "🔤", R.string.module_strings, R.string.module_strings_desc));
-        modules.add(new ModuleAdapter.Module(
-            "apk", "📦", R.string.module_apk, R.string.module_apk_desc));
-        modules.add(new ModuleAdapter.Module(
-            "manifest", "📋", R.string.module_manifest, R.string.module_manifest_desc));
-        modules.add(new ModuleAdapter.Module(
-            "dex", "🧬", R.string.module_dex, R.string.module_dex_desc));
-        modules.add(new ModuleAdapter.Module(
-            "assets", "🎨", R.string.module_assets, R.string.module_assets_desc));
-        modules.add(new ModuleAdapter.Module(
-            "so", "⚙️", R.string.module_so, R.string.module_so_desc));
+        String[][] modules = {
+            {"🔐", "Decoder", "HEX / Base64 / URL", "decoder"},
+            {"#️⃣", "Hash Lab", "MD5 / SHA-256", "hash"},
+            {"🔒", "Cipher", "XOR / AES / Caesar", "cipher"},
+            {"📊", "Entropy", "Entropy analysis", "entropy"},
+            {"🔬", "File Analysis", "Deep analysis", "file_analysis"},
+            {"🔢", "HEX Viewer", "HEX viewer / editor", "hex_viewer"},
+            {"🔤", "Strings", "String extraction", "strings"},
+            {"📦", "APK Explorer", "APK / ZIP explorer", "apk"},
+            {"📋", "Manifest", "AndroidManifest", "manifest"},
+            {"🧬", "DEX Header", "DEX analysis", "dex"},
+            {"🎨", "Assets", "Assets explorer", "assets"},
+            {"⚙️", "Native .so", "Native libraries", "so"}
+        };
 
-        ModuleAdapter adapter = new ModuleAdapter(this, modules, module -> {
-            Toast.makeText(this, "Module: " + module.id + " (მალე!)",
-                Toast.LENGTH_SHORT).show();
-        });
+        for (String[] m : modules) {
+            addCard(container, m[0], m[1], m[2], m[3]);
+        }
+    }
 
-        recyclerView.setAdapter(adapter);
+    private void addCard(LinearLayout c, String icon, String title, String desc, String id) {
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(30, 30, 30, 30);
+        card.setBackgroundColor(0xFF131824);
+
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT);
+        p.setMargins(20, 15, 20, 15);
+        card.setLayoutParams(p);
+
+        TextView i = new TextView(this);
+        i.setText(icon);
+        i.setTextSize(28);
+        card.addView(i);
+
+        TextView t = new TextView(this);
+        t.setText(title);
+        t.setTextColor(0xFF00E5FF);
+        t.setTextSize(16);
+        t.setPadding(0, 15, 0, 0);
+        card.addView(t);
+
+        TextView d = new TextView(this);
+        d.setText(desc);
+        d.setTextColor(0xFF8892B0);
+        d.setTextSize(12);
+        card.addView(d);
+
+        card.setOnClickListener(v ->
+            Toast.makeText(this, "Module: " + id, Toast.LENGTH_SHORT).show());
+
+        c.addView(card);
     }
 }
