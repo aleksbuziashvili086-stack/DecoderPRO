@@ -41,7 +41,7 @@ public class SignatureVerifier {
         try {
             ZipInputStream zis = new ZipInputStream(apkStream);
             ZipEntry e;
-            ByteArrayOutputStream mfBytes = null;
+            byte[] mfBytes = null;
             List<byte[]> certBytesList = new ArrayList<>();
             List<String> certNames = new ArrayList<>();
 
@@ -65,7 +65,7 @@ public class SignatureVerifier {
             if (r.hasV1) {
                 r.report.append("   ✅ Present (META-INF/MANIFEST.MF)\n");
                 if (mfBytes != null) {
-                    String mfText = new String(mfBytes.toByteArray(), "UTF-8");
+                    String mfText = new String(mfBytes, "UTF-8");
                     for (String line : mfText.split("\n")) {
                         if (line.startsWith("Signature-Version:") ||
                             line.startsWith("Created-By:") ||
