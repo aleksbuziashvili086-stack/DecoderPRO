@@ -19,8 +19,6 @@ import org.jf.dexlib2.iface.ClassDef;
 import org.jf.dexlib2.iface.DexFile;
 import org.jf.dexlib2.iface.Field;
 import org.jf.dexlib2.iface.Method;
-import org.jf.dexlib2.iface.MethodImplementation;
-import org.jf.dexlib2.iface.instruction.Instruction;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,7 +26,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -92,10 +89,7 @@ public class DexDecompilerActivity extends Activity {
         if (running) { toast("უკვე მიმდინარეობს..."); return; }
         running = true;
         progress.setVisibility(ProgressBar.VISIBLE);
-        output.setText("⏳ მიმდინარეობს DEX ანალიზი...\n\n" +
-                       "dexlib2 მუშაობს.\n" +
-                       "30-90 წამი.\n\n" +
-                       "ეკრანი არ ჩააქრო!");
+        output.setText("⏳ მიმდინარეობს DEX ანალიზი...\n\n30-90 წამი.\n\nეკრანი არ ჩააქრო!");
         new DexTask().execute();
     }
 
@@ -118,7 +112,6 @@ public class DexDecompilerActivity extends Activity {
                 fos.close(); is.close();
                 publishProgress("✅ ფაილი: " + FileUtils.formatSize(total));
 
-                // Extract all classes*.dex from APK
                 publishProgress("📦 DEX ფაილების ამოღება...");
                 List<File> dexFiles = new ArrayList<>();
                 if (inputFile.getName().toLowerCase().endsWith(".dex")) {
@@ -152,7 +145,6 @@ public class DexDecompilerActivity extends Activity {
                 sb.append("📦 DEX files: ").append(dexFiles.size()).append("\n\n");
 
                 int totalClasses = 0, totalMethods = 0, totalFields = 0;
-                TreeSet<String> allStrings = new TreeSet<>();
                 TreeMap<String, Integer> packages = new TreeMap<>();
                 StringBuilder classesDump = new StringBuilder();
                 StringBuilder methodsDump = new StringBuilder();
@@ -163,7 +155,7 @@ public class DexDecompilerActivity extends Activity {
 
                     for (ClassDef cls : dex.getClasses()) {
                         totalClasses++;
-                        String type = cls.getType(); // Lcom/foo/Bar;
+                        String type = cls.getType();
                         String className = type.substring(1, type.length() - 1).replace('/', '.');
                         String pkg = className.contains(".")
                             ? className.substring(0, className.lastIndexOf('.'))
@@ -172,49 +164,25 @@ public class DexDecompilerActivity extends Activity {
 
                         classesDump.append("L ").append(className).append("\n");
 
-                        // Fields
                         for (Field f : cls.getFields()) {
                             totalFields++;
                         }
 
-                        // Methods
                         for (Method m : cls.getMethods()) {
                             totalMethods++;
                             String mName = m.getName();
                             StringBuilder params = new StringBuilder();
                             for (CharSequence p : m.getParameterTypes()) {
-                                String pStr = p.toString();
-                                params.append(shortType(pStr)).append(", ");
+                                if (params.length() > 0) params.append(", ");
+                                params.append(shortType(p.toString()));
                             }
-                            if (params.length() > 0) params.setLength(params.length() - 2);
                             String ret = shortType(m.getReturnType());
                             methodsDump.append("M ").append(className)
                                 .append("::").append(mName)
                                 .append("(").append(params).append(")")
                                 .append(ret).append("\n");
-
-                            // Bytecode instructions
-                            MethodImplementation impl = m.getImplementation();
-                            if (impl != null) {
-                                int insnCount = 0;
-                                for (Instruction insn : impl.getInstructions()) {
-                                    insnCount++;
-                                }
-                            }
                         }
                     }
-
-                    // Strings from DEX
-                    try {
-                        for (CharSequence s : dex.getClasses().iterator().next().getType() != null
-                                ? new Iterable<CharSequence>() {
-                                    public java.util.Iterator<CharSequence> iterator() {
-                                        return java.util.Collections.emptyIterator();
-                                    }
-                                } : java.util.Collections.emptyList()) {
-                            allStrings.add(s.toString());
-                        }
-                    } catch (Exception ignored) {}
                 }
 
                 sb.append("📊 STATISTICS:\n");
@@ -236,7 +204,6 @@ public class DexDecompilerActivity extends Activity {
                 }
                 sb.append("\n");
 
-                // Methods sample
                 sb.append("═══════════════════════════════════════\n");
                 sb.append("🔧 METHODS (first 200):\n");
                 sb.append("═══════════════════════════════════════\n");
@@ -247,7 +214,6 @@ public class DexDecompilerActivity extends Activity {
                     sb.append("... +").append(methodLines.length - 200).append(" more methods\n");
                 sb.append("\n");
 
-                // Classes
                 sb.append("═══════════════════════════════════════\n");
                 sb.append("🏛️ CLASSES:\n");
                 sb.append("═══════════════════════════════════════\n");
