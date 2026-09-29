@@ -73,10 +73,13 @@ public class HomeActivity extends Activity {
     private void openModule(String id) {
         try {
             Class<?> target = null;
-            if (id.equals("decoder")) {
-                target = DecoderActivity.class;
+            switch (id) {
+                case "decoder":  target = DecoderActivity.class;  break;
+                case "hash":     target = HashActivity.class;     break;
+                case "entropy":  target = EntropyActivity.class;  break;
+                case "strings":  target = StringsActivity.class;  break;
+                // სხვა მოდულები შემდეგ ეტაპებზე
             }
-            // სხვა მოდულები მოგვიანებით დაემატება
 
             if (target != null) {
                 startActivity(new Intent(this, target));
