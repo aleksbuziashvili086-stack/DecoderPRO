@@ -22,6 +22,7 @@
         <activity android:name=".StringsActivity" android:exported="false" />
         <activity android:name=".CipherActivity" android:exported="false" />
         <activity android:name=".FileAnalysisActivity" android:exported="false" />
+        <activity android:name=".FileCompareActivity" android:exported="false" />
         <activity android:name=".HexViewerActivity" android:exported="false" />
         <activity android:name=".ApkExplorerActivity" android:exported="false" />
         <activity android:name=".ManifestActivity" android:exported="false" />

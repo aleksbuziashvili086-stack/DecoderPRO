@@ -1,12 +1,10 @@
 package com.alekss.toolkit;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 public class HomeActivity extends Activity {
     @Override
     protected void onCreate(Bundle s) {
@@ -19,6 +17,7 @@ public class HomeActivity extends Activity {
             {"🔒","Cipher","XOR / Caesar / ROT13","cipher"},
             {"📊","Entropy","Entropy analysis","entropy"},
             {"🔬","File Analysis","Deep analysis","file_analysis"},
+            {"🔍","File Compare","Compare two files","file_compare"},
             {"🔢","HEX Viewer","HEX viewer","hex_viewer"},
             {"🔤","Strings","String extraction","strings"},
             {"📦","APK Explorer","APK / ZIP explorer","apk"},
@@ -52,6 +51,7 @@ public class HomeActivity extends Activity {
                 case "cipher": t = CipherActivity.class; break;
                 case "entropy": t = EntropyActivity.class; break;
                 case "file_analysis": t = FileAnalysisActivity.class; break;
+                case "file_compare": t = FileCompareActivity.class; break;
                 case "hex_viewer": t = HexViewerActivity.class; break;
                 case "strings": t = StringsActivity.class; break;
                 case "apk": t = ApkExplorerActivity.class; break;
