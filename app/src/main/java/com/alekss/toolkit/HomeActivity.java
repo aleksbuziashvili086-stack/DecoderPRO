@@ -15,6 +15,7 @@ public class HomeActivity extends Activity {
             {"🔐","Decoder","HEX / Base64 / URL","decoder"},
             {"#️⃣","Hash Lab","MD5 / SHA-256","hash"},
             {"🔒","Cipher","XOR / Caesar / ROT13","cipher"},
+            {"🔓","Crypto Tools","Brute-force / Auto-detect","crypto"},
             {"📊","Entropy","Entropy analysis","entropy"},
             {"🔬","File Analysis","Deep analysis","file_analysis"},
             {"🔍","File Compare","Compare two files","file_compare"},
@@ -24,7 +25,8 @@ public class HomeActivity extends Activity {
             {"📋","Manifest","AndroidManifest","manifest"},
             {"🧬","DEX Header","DEX analysis","dex"},
             {"🎨","Assets","Assets explorer","assets"},
-            {"⚙️","Native .so","Native libraries","so"}
+            {"⚙️","Native .so","Native libraries","so"},
+            {"🎮","Game Lab","Game analysis","game_lab"}
         };
         for (String[] x : m) addCard(c, x[0], x[1], x[2], x[3]);
     }
@@ -49,6 +51,7 @@ public class HomeActivity extends Activity {
                 case "decoder": t = DecoderActivity.class; break;
                 case "hash": t = HashActivity.class; break;
                 case "cipher": t = CipherActivity.class; break;
+                case "crypto": t = CryptoActivity.class; break;
                 case "entropy": t = EntropyActivity.class; break;
                 case "file_analysis": t = FileAnalysisActivity.class; break;
                 case "file_compare": t = FileCompareActivity.class; break;
@@ -59,6 +62,7 @@ public class HomeActivity extends Activity {
                 case "dex": t = DexActivity.class; break;
                 case "assets": t = AssetsActivity.class; break;
                 case "so": t = NativeLibsActivity.class; break;
+                case "game_lab": t = GameLabActivity.class; break;
             }
             if (t != null) startActivity(new Intent(this, t));
             else Toast.makeText(this, id + " (მალე!)", Toast.LENGTH_SHORT).show();

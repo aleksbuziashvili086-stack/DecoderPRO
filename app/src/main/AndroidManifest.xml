@@ -21,6 +21,7 @@
         <activity android:name=".EntropyActivity" android:exported="false" />
         <activity android:name=".StringsActivity" android:exported="false" />
         <activity android:name=".CipherActivity" android:exported="false" />
+        <activity android:name=".CryptoActivity" android:exported="false" />
         <activity android:name=".FileAnalysisActivity" android:exported="false" />
         <activity android:name=".FileCompareActivity" android:exported="false" />
         <activity android:name=".HexViewerActivity" android:exported="false" />
@@ -29,5 +30,6 @@
         <activity android:name=".DexActivity" android:exported="false" />
         <activity android:name=".AssetsActivity" android:exported="false" />
         <activity android:name=".NativeLibsActivity" android:exported="false" />
+        <activity android:name=".GameLabActivity" android:exported="false" />
     </application>
 </manifest>
