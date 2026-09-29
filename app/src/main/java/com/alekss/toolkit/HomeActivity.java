@@ -1,6 +1,7 @@
 package com.alekss.toolkit;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -64,9 +65,26 @@ public class HomeActivity extends Activity {
         d.setTextSize(12);
         card.addView(d);
 
-        card.setOnClickListener(v ->
-            Toast.makeText(this, "Module: " + id, Toast.LENGTH_SHORT).show());
+        card.setOnClickListener(v -> openModule(id));
 
         c.addView(card);
+    }
+
+    private void openModule(String id) {
+        try {
+            Class<?> target = null;
+            if (id.equals("decoder")) {
+                target = DecoderActivity.class;
+            }
+            // სხვა მოდულები მოგვიანებით დაემატება
+
+            if (target != null) {
+                startActivity(new Intent(this, target));
+            } else {
+                Toast.makeText(this, "Module: " + id + " (მალე!)", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "შეცდომა: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 }
