@@ -22,5 +22,11 @@
         <activity android:name=".StringsActivity" android:exported="false" />
         <activity android:name=".CipherActivity" android:exported="false" />
         <activity android:name=".FileAnalysisActivity" android:exported="false" />
+        <activity android:name=".HexViewerActivity" android:exported="false" />
+        <activity android:name=".ApkExplorerActivity" android:exported="false" />
+        <activity android:name=".ManifestActivity" android:exported="false" />
+        <activity android:name=".DexActivity" android:exported="false" />
+        <activity android:name=".AssetsActivity" android:exported="false" />
+        <activity android:name=".NativeLibsActivity" android:exported="false" />
     </application>
 </manifest>

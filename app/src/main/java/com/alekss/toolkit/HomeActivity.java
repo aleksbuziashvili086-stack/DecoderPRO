@@ -9,59 +9,59 @@ import android.widget.Toast;
 
 public class HomeActivity extends Activity {
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle s) {
+        super.onCreate(s);
         setContentView(R.layout.activity_home);
-
-        LinearLayout container = findViewById(R.id.modules_container);
-
-        String[][] modules = {
-            {"🔐", "Decoder", "HEX / Base64 / URL", "decoder"},
-            {"#️⃣", "Hash Lab", "MD5 / SHA-256", "hash"},
-            {"🔒", "Cipher", "XOR / Caesar / ROT13", "cipher"},
-            {"📊", "Entropy", "Entropy analysis", "entropy"},
-            {"🔬", "File Analysis", "Deep analysis", "file_analysis"},
-            {"🔢", "HEX Viewer", "HEX viewer / editor", "hex_viewer"},
-            {"🔤", "Strings", "String extraction", "strings"},
-            {"📦", "APK Explorer", "APK / ZIP explorer", "apk"},
-            {"📋", "Manifest", "AndroidManifest", "manifest"},
-            {"🧬", "DEX Header", "DEX analysis", "dex"},
-            {"🎨", "Assets", "Assets explorer", "assets"},
-            {"⚙️", "Native .so", "Native libraries", "so"}
+        LinearLayout c = findViewById(R.id.modules_container);
+        String[][] m = {
+            {"🔐","Decoder","HEX / Base64 / URL","decoder"},
+            {"#️⃣","Hash Lab","MD5 / SHA-256","hash"},
+            {"🔒","Cipher","XOR / Caesar / ROT13","cipher"},
+            {"📊","Entropy","Entropy analysis","entropy"},
+            {"🔬","File Analysis","Deep analysis","file_analysis"},
+            {"🔢","HEX Viewer","HEX viewer","hex_viewer"},
+            {"🔤","Strings","String extraction","strings"},
+            {"📦","APK Explorer","APK / ZIP explorer","apk"},
+            {"📋","Manifest","AndroidManifest","manifest"},
+            {"🧬","DEX Header","DEX analysis","dex"},
+            {"🎨","Assets","Assets explorer","assets"},
+            {"⚙️","Native .so","Native libraries","so"}
         };
-
-        for (String[] m : modules) addCard(container, m[0], m[1], m[2], m[3]);
+        for (String[] x : m) addCard(c, x[0], x[1], x[2], x[3]);
     }
-
     private void addCard(LinearLayout c, String icon, String title, String desc, String id) {
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
-        card.setPadding(30, 30, 30, 30);
+        card.setPadding(30,30,30,30);
         card.setBackgroundColor(0xFF131824);
-        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        p.setMargins(20, 15, 20, 15);
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(-1, -2);
+        p.setMargins(20,15,20,15);
         card.setLayoutParams(p);
         TextView i = new TextView(this); i.setText(icon); i.setTextSize(28); card.addView(i);
         TextView t = new TextView(this); t.setText(title); t.setTextColor(0xFF00E5FF); t.setTextSize(16); t.setPadding(0,15,0,0); card.addView(t);
         TextView d = new TextView(this); d.setText(desc); d.setTextColor(0xFF8892B0); d.setTextSize(12); card.addView(d);
-        card.setOnClickListener(v -> openModule(id));
+        card.setOnClickListener(v -> open(id));
         c.addView(card);
     }
-
-    private void openModule(String id) {
+    private void open(String id) {
         try {
-            Class<?> target = null;
+            Class<?> t = null;
             switch (id) {
-                case "decoder":       target = DecoderActivity.class;       break;
-                case "hash":          target = HashActivity.class;          break;
-                case "cipher":        target = CipherActivity.class;        break;
-                case "entropy":       target = EntropyActivity.class;       break;
-                case "file_analysis": target = FileAnalysisActivity.class;  break;
-                case "strings":       target = StringsActivity.class;       break;
+                case "decoder": t = DecoderActivity.class; break;
+                case "hash": t = HashActivity.class; break;
+                case "cipher": t = CipherActivity.class; break;
+                case "entropy": t = EntropyActivity.class; break;
+                case "file_analysis": t = FileAnalysisActivity.class; break;
+                case "hex_viewer": t = HexViewerActivity.class; break;
+                case "strings": t = StringsActivity.class; break;
+                case "apk": t = ApkExplorerActivity.class; break;
+                case "manifest": t = ManifestActivity.class; break;
+                case "dex": t = DexActivity.class; break;
+                case "assets": t = AssetsActivity.class; break;
+                case "so": t = NativeLibsActivity.class; break;
             }
-            if (target != null) startActivity(new Intent(this, target));
-            else Toast.makeText(this, "Module: " + id + " (მალე!)", Toast.LENGTH_SHORT).show();
+            if (t != null) startActivity(new Intent(this, t));
+            else Toast.makeText(this, id + " (მალე!)", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Toast.makeText(this, "შეცდომა: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
