@@ -13,6 +13,7 @@ public class HomeActivity extends Activity {
         LinearLayout c = findViewById(R.id.modules_container);
         String[][] m = {
             {"🚀","FULL ANALYSIS","Recursive scan + auto findings","full_analysis"},
+            {"🔓","Auto-Decryption","Detect + decode + brute-force","decryption"},
             {"🔐","Decoder","HEX / Base64 / URL","decoder"},
             {"#️⃣","Hash Lab","MD5 / SHA-256","hash"},
             {"🔒","Cipher","XOR / Caesar / ROT13","cipher"},
@@ -37,15 +38,15 @@ public class HomeActivity extends Activity {
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
         card.setPadding(30,30,30,30);
-        boolean isFull = "full_analysis".equals(id);
-        card.setBackgroundColor(isFull ? 0xFF1A2A3A : 0xFF131824);
+        boolean isSpecial = id.equals("full_analysis") || id.equals("decryption");
+        card.setBackgroundColor(isSpecial ? 0xFF1A2A3A : 0xFF131824);
         LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(-1, -2);
         p.setMargins(20,15,20,15);
         card.setLayoutParams(p);
-        TextView i = new TextView(this); i.setText(icon); i.setTextSize(isFull ? 36 : 28); card.addView(i);
+        TextView i = new TextView(this); i.setText(icon); i.setTextSize(isSpecial ? 34 : 28); card.addView(i);
         TextView t = new TextView(this); t.setText(title);
-        t.setTextColor(isFull ? 0xFF00FFA3 : 0xFF00E5FF);
-        t.setTextSize(isFull ? 20 : 16); t.setPadding(0,15,0,0); card.addView(t);
+        t.setTextColor(isSpecial ? 0xFF00FFA3 : 0xFF00E5FF);
+        t.setTextSize(isSpecial ? 18 : 16); t.setPadding(0,15,0,0); card.addView(t);
         TextView d = new TextView(this); d.setText(desc); d.setTextColor(0xFF8892B0); d.setTextSize(12); card.addView(d);
         card.setOnClickListener(v -> open(id));
         c.addView(card);
@@ -55,6 +56,7 @@ public class HomeActivity extends Activity {
             Class<?> t = null;
             switch (id) {
                 case "full_analysis": t = FullAnalysisActivity.class; break;
+                case "decryption": t = DecryptionActivity.class; break;
                 case "decoder": t = DecoderActivity.class; break;
                 case "hash": t = HashActivity.class; break;
                 case "cipher": t = CipherActivity.class; break;
