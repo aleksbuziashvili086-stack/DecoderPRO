@@ -22,12 +22,13 @@ public class HomeActivity extends Activity {
             {"🔢","HEX Viewer","HEX viewer","hex_viewer"},
             {"🔤","Strings","String extraction","strings"},
             {"📦","APK Explorer","APK / ZIP explorer","apk"},
-            {"📋","Manifest","AndroidManifest","manifest"},
+            {"📋","Manifest","AndroidManifest (AXML)","manifest"},
+            {"🔐","APK Signature","V1/V2/V3 verification","signature"},
             {"🧬","DEX Header","DEX analysis","dex"},
             {"🎨","Assets","Assets explorer","assets"},
-            {"⚙️","Native .so","Native libraries","so"},
+            {"⚙️","Native .so","ELF analysis","so"},
             {"🎮","Game Lab","Game analysis","game_lab"},
-            {"🧬","JADX Decompiler","DEX → Java source","jadx"}
+            {"🧬","JADX Decompiler","DEX Inspector (dexlib2)","jadx"}
         };
         for (String[] x : m) addCard(c, x[0], x[1], x[2], x[3]);
     }
@@ -60,6 +61,7 @@ public class HomeActivity extends Activity {
                 case "strings": t = StringsActivity.class; break;
                 case "apk": t = ApkExplorerActivity.class; break;
                 case "manifest": t = ManifestActivity.class; break;
+                case "signature": t = SignatureActivity.class; break;
                 case "dex": t = DexActivity.class; break;
                 case "assets": t = AssetsActivity.class; break;
                 case "so": t = NativeLibsActivity.class; break;

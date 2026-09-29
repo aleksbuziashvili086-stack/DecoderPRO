@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/bg_dark" android:padding="12dp">
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="🔐 APK Signature" android:textColor="@color/neon_cyan"
+        android:textSize="22sp" android:textStyle="bold" android:paddingBottom="10dp"/>
+    <Button android:id="@+id/btn_sig_pick" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:text="📁 აირჩიე APK"
+        android:textColor="@color/bg_dark" android:backgroundTint="@color/neon_green"/>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:layout_marginTop="6dp">
+        <Button android:id="@+id/btn_sig_copy" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:layout_weight="1" android:text="📋 Copy"
+            android:textColor="@color/neon_cyan" android:backgroundTint="@color/bg_card"/>
+        <Button android:id="@+id/btn_sig_clear" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="4dp"
+            android:text="🗑 Clear" android:textColor="@color/neon_red" android:backgroundTint="@color/bg_card"/>
+    </LinearLayout>
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:layout_marginTop="8dp">
+        <TextView android:id="@+id/sig_output" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textColor="@color/neon_green"
+            android:background="@color/bg_card" android:padding="8dp"
+            android:fontFamily="monospace" android:textSize="9sp"
+            android:textIsSelectable="true"/>
+    </ScrollView>
+</LinearLayout>
