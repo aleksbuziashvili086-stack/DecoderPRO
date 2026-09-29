@@ -15,13 +15,30 @@
         android:textStyle="bold"
         android:paddingBottom="16dp" />
 
+    <Button
+        android:id="@+id/btn_fa_pick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="📁 აირჩიე ფაილი"
+        android:textColor="@color/bg_dark"
+        android:backgroundTint="@color/neon_green"
+        android:padding="12dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="ან ჩასვი ტექსტი:"
+        android:textColor="@color/text_muted"
+        android:textSize="12sp" />
+
     <EditText
         android:id="@+id/fa_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minLines="4"
+        android:minLines="3"
         android:gravity="top"
-        android:hint="ჩასვი ფაილის შიგთავსი ან ტექსტი..."
+        android:hint="ჩასვი ტექსტი..."
         android:textColorHint="@color/text_muted"
         android:textColor="@color/text_primary"
         android:background="@color/bg_card"
