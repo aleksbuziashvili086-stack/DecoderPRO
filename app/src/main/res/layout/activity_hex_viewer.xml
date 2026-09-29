@@ -2,15 +2,43 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="vertical" android:background="@color/bg_dark" android:padding="16dp">
+
     <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
         android:text="HEX Viewer" android:textColor="@color/neon_cyan"
         android:textSize="24sp" android:textStyle="bold" android:paddingBottom="16dp"/>
+
     <Button android:id="@+id/btn_hex_pick" android:layout_width="match_parent"
         android:layout_height="wrap_content" android:text="📁 აირჩიე ფაილი"
         android:textColor="@color/bg_dark" android:backgroundTint="@color/neon_green"/>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:layout_marginTop="8dp">
+        <Button android:id="@+id/btn_hex_copy" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="📋 HEX" android:textColor="@color/neon_cyan"
+            android:backgroundTint="@color/bg_card" android:textSize="11sp"/>
+        <Button android:id="@+id/btn_hex_copy_ascii" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:layout_weight="1"
+            android:layout_marginStart="4dp" android:text="🔤 ASCII"
+            android:textColor="@color/neon_cyan" android:backgroundTint="@color/bg_card"
+            android:textSize="11sp"/>
+        <Button android:id="@+id/btn_hex_save" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:layout_weight="1"
+            android:layout_marginStart="4dp" android:text="💾 Save"
+            android:textColor="@color/neon_green" android:backgroundTint="@color/bg_card"
+            android:textSize="11sp"/>
+        <Button android:id="@+id/btn_hex_edit" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:layout_weight="1"
+            android:layout_marginStart="4dp" android:text="✏️ Edit"
+            android:textColor="@color/neon_yellow" android:backgroundTint="@color/bg_card"
+            android:textSize="11sp"/>
+    </LinearLayout>
+
     <Button android:id="@+id/btn_hex_clear" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="🗑 Clear"
-        android:textColor="@color/neon_red" android:backgroundTint="@color/bg_card"/>
+        android:layout_height="wrap_content" android:layout_marginTop="8dp"
+        android:text="🗑 Clear" android:textColor="@color/neon_red"
+        android:backgroundTint="@color/bg_card"/>
+
     <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
         android:layout_weight="1" android:layout_marginTop="12dp">
         <TextView android:id="@+id/hex_output" android:layout_width="match_parent"
