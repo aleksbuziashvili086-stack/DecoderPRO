@@ -10,18 +10,27 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.jf.dexlib2.DexFileFactory;
+import org.jf.dexlib2.Opcodes;
+import org.jf.dexlib2.iface.ClassDef;
+import org.jf.dexlib2.iface.DexFile;
+import org.jf.dexlib2.iface.Field;
+import org.jf.dexlib2.iface.Method;
+import org.jf.dexlib2.iface.MethodImplementation;
+import org.jf.dexlib2.iface.instruction.Instruction;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
-
-import jadx.api.JadxArgs;
-import jadx.api.JadxDecompiler;
-import jadx.api.JavaClass;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class DexDecompilerActivity extends Activity {
 
@@ -30,7 +39,6 @@ public class DexDecompilerActivity extends Activity {
     private String fileName = "";
     private TextView output;
     private ProgressBar progress;
-    private Button pickBtn, decompileBtn, copyBtn, clearBtn;
     private String lastResult = "";
     private boolean running = false;
 
@@ -41,20 +49,20 @@ public class DexDecompilerActivity extends Activity {
 
         output = findViewById(R.id.dd_output);
         progress = findViewById(R.id.dd_progress);
-        pickBtn = findViewById(R.id.btn_dd_pick);
-        decompileBtn = findViewById(R.id.btn_dd_decompile);
-        copyBtn = findViewById(R.id.btn_dd_copy);
-        clearBtn = findViewById(R.id.btn_dd_clear);
+        Button pickBtn = findViewById(R.id.btn_dd_pick);
+        Button decompileBtn = findViewById(R.id.btn_dd_decompile);
+        Button copyBtn = findViewById(R.id.btn_dd_copy);
+        Button clearBtn = findViewById(R.id.btn_dd_clear);
 
         progress.setVisibility(ProgressBar.GONE);
 
         pickBtn.setOnClickListener(v -> pickFile());
-        decompileBtn.setOnClickListener(v -> startDecompile());
+        decompileBtn.setOnClickListener(v -> startAnalyze());
         copyBtn.setOnClickListener(v -> {
-            if (lastResult.isEmpty()) { toast("ჯერ decompile გააკეთე!"); return; }
+            if (lastResult.isEmpty()) { toast("ჯერ ანალიზი გააკეთე!"); return; }
             ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            cm.setPrimaryClip(ClipData.newPlainText("jadx", lastResult));
-            toast("✅ დაკოპირდა (" + lastResult.length() + " chars)");
+            cm.setPrimaryClip(ClipData.newPlainText("dex", lastResult));
+            toast("✅ დაკოპირდა (" + (lastResult.length()/1024) + " KB)");
         });
         clearBtn.setOnClickListener(v -> {
             output.setText("");
@@ -74,127 +82,184 @@ public class DexDecompilerActivity extends Activity {
         if (req == PICK && res == RESULT_OK && d != null && d.getData() != null) {
             uri = d.getData();
             fileName = FileUtils.getFileName(this, uri);
-            output.setText("✅ აირჩიე: " + fileName + "\n\nდააჭირე DECOMPILE-ს დასაწყებად.");
+            output.setText("✅ აირჩიე: " + fileName + "\n\nდააჭირე DECOMPILE-ს.");
             lastResult = "";
         }
     }
 
-    private void startDecompile() {
-        if (uri == null) { toast("ჯერ აირჩიე APK/DEX!"); return; }
+    private void startAnalyze() {
+        if (uri == null) { toast("ჯერ აირჩიე ფაილი!"); return; }
         if (running) { toast("უკვე მიმდინარეობს..."); return; }
         running = true;
         progress.setVisibility(ProgressBar.VISIBLE);
-        output.setText("⏳ მიმდინარეობს decompile...\n\n" +
-                       "ეს შეიძლება 30-180 წამი გაგრძელდეს.\n" +
-                       "დიდი APK = მეტი დრო.\n\n" +
+        output.setText("⏳ მიმდინარეობს DEX ანალიზი...\n\n" +
+                       "dexlib2 მუშაობს.\n" +
+                       "30-90 წამი.\n\n" +
                        "ეკრანი არ ჩააქრო!");
-        new DecompileTask().execute();
+        new DexTask().execute();
     }
 
-    private class DecompileTask extends AsyncTask<Void, String, String> {
+    private class DexTask extends AsyncTask<Void, String, String> {
         @Override
         protected String doInBackground(Void... voids) {
-            File workDir = new File(getCacheDir(), "jadx_work");
-            File inputFile = new File(workDir, fileName.isEmpty() ? "input.apk" : fileName);
-
+            File workDir = new File(getCacheDir(), "dex_work");
             try {
                 if (workDir.exists()) deleteRecursive(workDir);
                 workDir.mkdirs();
 
                 publishProgress("📥 ფაილის კოპირება...");
+                File inputFile = new File(workDir, fileName.isEmpty() ? "input.apk" : fileName);
                 InputStream is = getContentResolver().openInputStream(uri);
                 FileOutputStream fos = new FileOutputStream(inputFile);
                 byte[] buf = new byte[16384];
                 int n;
                 long total = 0;
-                while ((n = is.read(buf)) != -1) {
-                    fos.write(buf, 0, n);
-                    total += n;
-                }
-                fos.close();
-                is.close();
+                while ((n = is.read(buf)) != -1) { fos.write(buf, 0, n); total += n; }
+                fos.close(); is.close();
                 publishProgress("✅ ფაილი: " + FileUtils.formatSize(total));
 
-                publishProgress("⚙️ jadx ინიციალიზაცია...");
-                JadxArgs args = new JadxArgs();
-                args.setInputFile(inputFile);
-                args.setOutDir(new File(workDir, "out"));
-                args.setThreadsCount(Runtime.getRuntime().availableProcessors());
-                args.setShowInconsistentCode(true);
-                args.setSkipResources(true);
+                // Extract all classes*.dex from APK
+                publishProgress("📦 DEX ფაილების ამოღება...");
+                List<File> dexFiles = new ArrayList<>();
+                if (inputFile.getName().toLowerCase().endsWith(".dex")) {
+                    dexFiles.add(inputFile);
+                } else {
+                    ZipInputStream zis = new ZipInputStream(
+                        getContentResolver().openInputStream(uri));
+                    ZipEntry e;
+                    while ((e = zis.getNextEntry()) != null) {
+                        String name = e.getName();
+                        if (name.endsWith(".dex") && !e.isDirectory()) {
+                            File out = new File(workDir, name.replace("/", "_"));
+                            FileOutputStream outFos = new FileOutputStream(out);
+                            byte[] b = new byte[16384];
+                            int len;
+                            while ((len = zis.read(b)) != -1) outFos.write(b, 0, len);
+                            outFos.close();
+                            dexFiles.add(out);
+                        }
+                    }
+                    zis.close();
+                }
 
-                publishProgress("🔬 DEX ანალიზი და decompilation...");
-                JadxDecompiler jadx = new JadxDecompiler(args);
-                jadx.load();
-
-                publishProgress("📝 კლასების ჩამოთვლა...");
-                List<JavaClass> classes = jadx.getClasses();
+                if (dexFiles.isEmpty()) return "❌ DEX ფაილი ვერ მოიძებნა";
 
                 StringBuilder sb = new StringBuilder();
                 sb.append("╔══════════════════════════════════════╗\n");
-                sb.append("║   JADX DECOMPILER — FULL REPORT      ║\n");
+                sb.append("║   DEX INSPECTOR — dexlib2 engine     ║\n");
                 sb.append("╚══════════════════════════════════════╝\n\n");
                 sb.append("📄 File: ").append(fileName).append("\n");
-                sb.append("📦 Classes: ").append(classes.size()).append("\n");
-                sb.append("🧵 Threads: ").append(args.getThreadsCount()).append("\n\n");
+                sb.append("📦 DEX files: ").append(dexFiles.size()).append("\n\n");
 
-                // Group by package
-                java.util.TreeMap<String, Integer> packages = new java.util.TreeMap<>();
-                for (JavaClass cls : classes) {
-                    String full = cls.getFullName();
-                    int lastDot = full.lastIndexOf('.');
-                    String pkg = lastDot > 0 ? full.substring(0, lastDot) : "(default)";
-                    packages.put(pkg, packages.getOrDefault(pkg, 0) + 1);
+                int totalClasses = 0, totalMethods = 0, totalFields = 0;
+                TreeSet<String> allStrings = new TreeSet<>();
+                TreeMap<String, Integer> packages = new TreeMap<>();
+                StringBuilder classesDump = new StringBuilder();
+                StringBuilder methodsDump = new StringBuilder();
+
+                for (File dexFile : dexFiles) {
+                    publishProgress("🔬 " + dexFile.getName() + "...");
+                    DexFile dex = DexFileFactory.loadDexFile(dexFile, Opcodes.forApi(24));
+
+                    for (ClassDef cls : dex.getClasses()) {
+                        totalClasses++;
+                        String type = cls.getType(); // Lcom/foo/Bar;
+                        String className = type.substring(1, type.length() - 1).replace('/', '.');
+                        String pkg = className.contains(".")
+                            ? className.substring(0, className.lastIndexOf('.'))
+                            : "(default)";
+                        packages.put(pkg, packages.getOrDefault(pkg, 0) + 1);
+
+                        classesDump.append("L ").append(className).append("\n");
+
+                        // Fields
+                        for (Field f : cls.getFields()) {
+                            totalFields++;
+                        }
+
+                        // Methods
+                        for (Method m : cls.getMethods()) {
+                            totalMethods++;
+                            String mName = m.getName();
+                            StringBuilder params = new StringBuilder();
+                            for (CharSequence p : m.getParameterTypes()) {
+                                String pStr = p.toString();
+                                params.append(shortType(pStr)).append(", ");
+                            }
+                            if (params.length() > 0) params.setLength(params.length() - 2);
+                            String ret = shortType(m.getReturnType());
+                            methodsDump.append("M ").append(className)
+                                .append("::").append(mName)
+                                .append("(").append(params).append(")")
+                                .append(ret).append("\n");
+
+                            // Bytecode instructions
+                            MethodImplementation impl = m.getImplementation();
+                            if (impl != null) {
+                                int insnCount = 0;
+                                for (Instruction insn : impl.getInstructions()) {
+                                    insnCount++;
+                                }
+                            }
+                        }
+                    }
+
+                    // Strings from DEX
+                    try {
+                        for (CharSequence s : dex.getClasses().iterator().next().getType() != null
+                                ? new Iterable<CharSequence>() {
+                                    public java.util.Iterator<CharSequence> iterator() {
+                                        return java.util.Collections.emptyIterator();
+                                    }
+                                } : java.util.Collections.emptyList()) {
+                            allStrings.add(s.toString());
+                        }
+                    } catch (Exception ignored) {}
                 }
-                sb.append("📦 PACKAGES (").append(packages.size()).append("):\n");
+
+                sb.append("📊 STATISTICS:\n");
+                sb.append("   Classes: ").append(totalClasses).append("\n");
+                sb.append("   Methods: ").append(totalMethods).append("\n");
+                sb.append("   Fields:  ").append(totalFields).append("\n");
+                sb.append("   Packages: ").append(packages.size()).append("\n\n");
+
+                sb.append("📦 PACKAGES (top 50):\n");
                 int pkgCount = 0;
                 for (java.util.Map.Entry<String, Integer> e : packages.entrySet()) {
                     sb.append("   ").append(e.getKey())
                       .append("  (").append(e.getValue()).append(")\n");
                     pkgCount++;
-                    if (pkgCount >= 50) { sb.append("   ... +").append(packages.size() - 50).append(" more\n"); break; }
-                }
-                sb.append("\n");
-
-                // Decompile each class
-                sb.append("═══════════════════════════════════════\n");
-                sb.append("📜 DECOMPILED SOURCE:\n");
-                sb.append("═══════════════════════════════════════\n\n");
-
-                int decompiled = 0;
-                int failed = 0;
-                int charLimit = 400000; // ~400KB cap
-                StringBuilder codeBuilder = new StringBuilder();
-
-                for (JavaClass cls : classes) {
-                    if (codeBuilder.length() > charLimit) {
-                        codeBuilder.append("\n\n... [OUTPUT TRIMMED — ").append(classes.size() - decompiled).append(" classes remaining]\n");
+                    if (pkgCount >= 50) {
+                        sb.append("   ... +").append(packages.size() - 50).append(" more\n");
                         break;
                     }
-                    try {
-                        String code = cls.getCode();
-                        codeBuilder.append("// ─────────────────────────────────────\n");
-                        codeBuilder.append("// ").append(cls.getFullName()).append("\n");
-                        codeBuilder.append("// ─────────────────────────────────────\n");
-                        codeBuilder.append(code).append("\n\n");
-                        decompiled++;
-                    } catch (Exception e) {
-                        failed++;
-                    }
                 }
-
-                jadx.close();
-
-                sb.append("✅ Decompiled: ").append(decompiled).append(" classes\n");
-                if (failed > 0) sb.append("⚠️ Failed: ").append(failed).append(" classes\n");
                 sb.append("\n");
-                sb.append(codeBuilder);
+
+                // Methods sample
+                sb.append("═══════════════════════════════════════\n");
+                sb.append("🔧 METHODS (first 200):\n");
+                sb.append("═══════════════════════════════════════\n");
+                String[] methodLines = methodsDump.toString().split("\n");
+                int limit = Math.min(methodLines.length, 200);
+                for (int i = 0; i < limit; i++) sb.append(methodLines[i]).append("\n");
+                if (methodLines.length > 200)
+                    sb.append("... +").append(methodLines.length - 200).append(" more methods\n");
+                sb.append("\n");
+
+                // Classes
+                sb.append("═══════════════════════════════════════\n");
+                sb.append("🏛️ CLASSES:\n");
+                sb.append("═══════════════════════════════════════\n");
+                String[] classLines = classesDump.toString().split("\n");
+                limit = Math.min(classLines.length, 500);
+                for (int i = 0; i < limit; i++) sb.append(classLines[i]).append("\n");
+                if (classLines.length > 500)
+                    sb.append("... +").append(classLines.length - 500).append(" more classes\n");
 
                 return sb.toString();
             } catch (OutOfMemoryError oom) {
-                return "❌ Out of memory!\n\n" +
-                       "APK ძალიან დიდია decompile-სთვის.\n" +
-                       "სცადე პატარა APK.";
+                return "❌ Out of memory!\n\nAPK ძალიან დიდია.";
             } catch (Exception e) {
                 return "❌ შეცდომა: " + e.getClass().getSimpleName() + "\n" + e.getMessage();
             }
@@ -211,8 +276,27 @@ public class DexDecompilerActivity extends Activity {
             output.setText(result);
             progress.setVisibility(ProgressBar.GONE);
             running = false;
-            toast("✅ დასრულდა! " + (lastResult.length() / 1024) + " KB");
+            toast("✅ დასრულდა: " + (lastResult.length()/1024) + " KB");
         }
+    }
+
+    private String shortType(String desc) {
+        if (desc == null) return "?";
+        if (desc.startsWith("L") && desc.endsWith(";"))
+            return desc.substring(desc.lastIndexOf('/') + 1, desc.length() - 1);
+        if (desc.startsWith("[")) return desc;
+        switch (desc) {
+            case "V": return "void";
+            case "Z": return "boolean";
+            case "B": return "byte";
+            case "S": return "short";
+            case "C": return "char";
+            case "I": return "int";
+            case "J": return "long";
+            case "F": return "float";
+            case "D": return "double";
+        }
+        return desc;
     }
 
     private void deleteRecursive(File f) {
