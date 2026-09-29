@@ -17,6 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".HomeActivity" android:exported="false" />
+        <activity android:name=".FullAnalysisActivity" android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity android:name=".DecoderActivity" android:exported="false" />
         <activity android:name=".HashActivity" android:exported="false" />
         <activity android:name=".EntropyActivity" android:exported="false" />
