@@ -1,26 +1,47 @@
 plugins {
     id 'com.android.application'
 }
+
 android {
     namespace 'com.alekss.toolkit'
     compileSdk 34
+
     defaultConfig {
         applicationId "com.alekss.toolkit"
         minSdk 24
         targetSdk 34
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+
+    packagingOptions {
+        resources {
+            excludes += ['META-INF/DEPENDENCIES', 'META-INF/LICENSE', 'META-INF/LICENSE.txt',
+                          'META-INF/NOTICE', 'META-INF/NOTICE.txt', 'META-INF/ASL2.0',
+                          'META-INF/*.kotlin_module', 'META-INF/INDEX.LIST']
+        }
+    }
+
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
 }
+
 dependencies {
+    implementation 'io.github.skylot:jadx-core:1.5.0'
+    implementation 'io.github.skylot:jadx-dex-input:1.5.0'
+    implementation 'com.android.support:multidex:1.0.3'
 }

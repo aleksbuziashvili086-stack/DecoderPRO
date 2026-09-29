@@ -7,7 +7,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.DecoderPRO"
-        android:requestLegacyExternalStorage="true">
+        android:requestLegacyExternalStorage="true"
+        android:largeHeap="true">
         <activity android:name=".SplashActivity" android:exported="true"
             android:theme="@style/Theme.DecoderPRO.Splash">
             <intent-filter>
@@ -31,5 +32,7 @@
         <activity android:name=".AssetsActivity" android:exported="false" />
         <activity android:name=".NativeLibsActivity" android:exported="false" />
         <activity android:name=".GameLabActivity" android:exported="false" />
+        <activity android:name=".DexDecompilerActivity" android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
     </application>
 </manifest>

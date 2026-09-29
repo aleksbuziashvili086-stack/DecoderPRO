@@ -26,7 +26,8 @@ public class HomeActivity extends Activity {
             {"🧬","DEX Header","DEX analysis","dex"},
             {"🎨","Assets","Assets explorer","assets"},
             {"⚙️","Native .so","Native libraries","so"},
-            {"🎮","Game Lab","Game analysis","game_lab"}
+            {"🎮","Game Lab","Game analysis","game_lab"},
+            {"🧬","JADX Decompiler","DEX → Java source","jadx"}
         };
         for (String[] x : m) addCard(c, x[0], x[1], x[2], x[3]);
     }
@@ -63,6 +64,7 @@ public class HomeActivity extends Activity {
                 case "assets": t = AssetsActivity.class; break;
                 case "so": t = NativeLibsActivity.class; break;
                 case "game_lab": t = GameLabActivity.class; break;
+                case "jadx": t = DexDecompilerActivity.class; break;
             }
             if (t != null) startActivity(new Intent(this, t));
             else Toast.makeText(this, id + " (მალე!)", Toast.LENGTH_SHORT).show();
