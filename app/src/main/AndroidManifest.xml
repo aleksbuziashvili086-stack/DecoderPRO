@@ -20,5 +20,7 @@
         <activity android:name=".HashActivity" android:exported="false" />
         <activity android:name=".EntropyActivity" android:exported="false" />
         <activity android:name=".StringsActivity" android:exported="false" />
+        <activity android:name=".CipherActivity" android:exported="false" />
+        <activity android:name=".FileAnalysisActivity" android:exported="false" />
     </application>
 </manifest>

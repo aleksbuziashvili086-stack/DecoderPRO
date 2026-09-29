@@ -18,7 +18,7 @@ public class HomeActivity extends Activity {
         String[][] modules = {
             {"🔐", "Decoder", "HEX / Base64 / URL", "decoder"},
             {"#️⃣", "Hash Lab", "MD5 / SHA-256", "hash"},
-            {"🔒", "Cipher", "XOR / AES / Caesar", "cipher"},
+            {"🔒", "Cipher", "XOR / Caesar / ROT13", "cipher"},
             {"📊", "Entropy", "Entropy analysis", "entropy"},
             {"🔬", "File Analysis", "Deep analysis", "file_analysis"},
             {"🔢", "HEX Viewer", "HEX viewer / editor", "hex_viewer"},
@@ -30,9 +30,7 @@ public class HomeActivity extends Activity {
             {"⚙️", "Native .so", "Native libraries", "so"}
         };
 
-        for (String[] m : modules) {
-            addCard(container, m[0], m[1], m[2], m[3]);
-        }
+        for (String[] m : modules) addCard(container, m[0], m[1], m[2], m[3]);
     }
 
     private void addCard(LinearLayout c, String icon, String title, String desc, String id) {
@@ -40,33 +38,14 @@ public class HomeActivity extends Activity {
         card.setOrientation(LinearLayout.VERTICAL);
         card.setPadding(30, 30, 30, 30);
         card.setBackgroundColor(0xFF131824);
-
         LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         p.setMargins(20, 15, 20, 15);
         card.setLayoutParams(p);
-
-        TextView i = new TextView(this);
-        i.setText(icon);
-        i.setTextSize(28);
-        card.addView(i);
-
-        TextView t = new TextView(this);
-        t.setText(title);
-        t.setTextColor(0xFF00E5FF);
-        t.setTextSize(16);
-        t.setPadding(0, 15, 0, 0);
-        card.addView(t);
-
-        TextView d = new TextView(this);
-        d.setText(desc);
-        d.setTextColor(0xFF8892B0);
-        d.setTextSize(12);
-        card.addView(d);
-
+        TextView i = new TextView(this); i.setText(icon); i.setTextSize(28); card.addView(i);
+        TextView t = new TextView(this); t.setText(title); t.setTextColor(0xFF00E5FF); t.setTextSize(16); t.setPadding(0,15,0,0); card.addView(t);
+        TextView d = new TextView(this); d.setText(desc); d.setTextColor(0xFF8892B0); d.setTextSize(12); card.addView(d);
         card.setOnClickListener(v -> openModule(id));
-
         c.addView(card);
     }
 
@@ -74,18 +53,15 @@ public class HomeActivity extends Activity {
         try {
             Class<?> target = null;
             switch (id) {
-                case "decoder":  target = DecoderActivity.class;  break;
-                case "hash":     target = HashActivity.class;     break;
-                case "entropy":  target = EntropyActivity.class;  break;
-                case "strings":  target = StringsActivity.class;  break;
-                // სხვა მოდულები შემდეგ ეტაპებზე
+                case "decoder":       target = DecoderActivity.class;       break;
+                case "hash":          target = HashActivity.class;          break;
+                case "cipher":        target = CipherActivity.class;        break;
+                case "entropy":       target = EntropyActivity.class;       break;
+                case "file_analysis": target = FileAnalysisActivity.class;  break;
+                case "strings":       target = StringsActivity.class;       break;
             }
-
-            if (target != null) {
-                startActivity(new Intent(this, target));
-            } else {
-                Toast.makeText(this, "Module: " + id + " (მალე!)", Toast.LENGTH_SHORT).show();
-            }
+            if (target != null) startActivity(new Intent(this, target));
+            else Toast.makeText(this, "Module: " + id + " (მალე!)", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Toast.makeText(this, "შეცდომა: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }

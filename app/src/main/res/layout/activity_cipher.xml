@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_dark"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cipher Tools"
+        android:textColor="@color/neon_cyan"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:paddingBottom="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="12dp">
+
+        <Button
+            android:id="@+id/btn_xor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="XOR"
+            android:textColor="@color/neon_cyan"
+            android:backgroundTint="@color/bg_card" />
+
+        <Button
+            android:id="@+id/btn_caesar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Caesar"
+            android:textColor="@color/neon_cyan"
+            android:backgroundTint="@color/bg_card" />
+
+        <Button
+            android:id="@+id/btn_rot13"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="ROT13"
+            android:textColor="@color/neon_cyan"
+            android:backgroundTint="@color/bg_card" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/cipher_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minLines="3"
+        android:gravity="top"
+        android:hint="შეიყვანე ტექსტი..."
+        android:textColorHint="@color/text_muted"
+        android:textColor="@color/text_primary"
+        android:background="@color/bg_card"
+        android:padding="12dp"
+        android:inputType="textMultiLine" />
+
+    <EditText
+        android:id="@+id/cipher_key"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Key (XOR) / Shift (Caesar)"
+        android:textColorHint="@color/text_muted"
+        android:textColor="@color/text_primary"
+        android:background="@color/bg_card"
+        android:padding="12dp"
+        android:inputType="text" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp">
+
+        <Button
+            android:id="@+id/btn_cipher_decode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Decode"
+            android:textColor="@color/bg_dark"
+            android:backgroundTint="@color/neon_cyan" />
+
+        <Button
+            android:id="@+id/btn_cipher_encode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Encode"
+            android:textColor="@color/bg_dark"
+            android:backgroundTint="@color/neon_green" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/cipher_output"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="12dp"
+        android:minLines="3"
+        android:gravity="top"
+        android:text=""
+        android:textColor="@color/neon_green"
+        android:background="@color/bg_card"
+        android:padding="12dp"
+        android:textSize="14sp"
+        android:fontFamily="monospace" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp">
+
+        <Button
+            android:id="@+id/btn_cipher_copy"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="📋 Copy"
+            android:textColor="@color/neon_cyan"
+            android:backgroundTint="@color/bg_card" />
+
+        <Button
+            android:id="@+id/btn_cipher_clear"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="🗑 Clear"
+            android:textColor="@color/neon_red"
+            android:backgroundTint="@color/bg_card" />
+    </LinearLayout>
+
+</LinearLayout>
