@@ -12,6 +12,7 @@ public class HomeActivity extends Activity {
         setContentView(R.layout.activity_home);
         LinearLayout c = findViewById(R.id.modules_container);
         String[][] m = {
+            {"🛠️","APK MODDER","Decode + Edit + Rebuild","modder"},
             {"🚀","DEEP ANALYZER","Streaming • 4GB+ APK safe","deep"},
             {"🚀","FULL ANALYSIS","Recursive scan + auto findings","full_analysis"},
             {"🔓","Auto-Decryption","Detect + decode + brute-force","decryption"},
@@ -39,7 +40,7 @@ public class HomeActivity extends Activity {
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
         card.setPadding(30,30,30,30);
-        boolean isSpecial = id.equals("deep") || id.equals("full_analysis") || id.equals("decryption");
+        boolean isSpecial = id.equals("modder") || id.equals("deep") || id.equals("full_analysis") || id.equals("decryption");
         card.setBackgroundColor(isSpecial ? 0xFF1A2A3A : 0xFF131824);
         LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(-1, -2);
         p.setMargins(20,15,20,15);
@@ -56,6 +57,7 @@ public class HomeActivity extends Activity {
         try {
             Class<?> t = null;
             switch (id) {
+                case "modder": t = ApkModderActivity.class; break;
                 case "deep": t = DeepAnalysisActivity.class; break;
                 case "full_analysis": t = FullAnalysisActivity.class; break;
                 case "decryption": t = DecryptionActivity.class; break;

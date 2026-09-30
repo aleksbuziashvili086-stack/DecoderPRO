@@ -17,6 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".HomeActivity" android:exported="false" />
+        <activity android:name=".ApkModderActivity" android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity android:name=".DeepAnalysisActivity" android:exported="false"
             android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity android:name=".FullAnalysisActivity" android:exported="false"
