@@ -1,23 +1,18 @@
 package com.alekss.toolkit;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apktool.Main;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.PrintStream;
 
 public class ApkModderActivity extends Activity {
 
@@ -26,11 +21,9 @@ public class ApkModderActivity extends Activity {
     private String fileName = "";
     private TextView output;
     private ProgressBar progress;
-    private Button pickBtn, decodeBtn, clearBtn;
     private String lastResult = "";
     private File workDir;
     private File inputApk;
-    private File decodedDir;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -39,9 +32,9 @@ public class ApkModderActivity extends Activity {
 
         output = findViewById(R.id.modder_output);
         progress = findViewById(R.id.modder_progress);
-        pickBtn = findViewById(R.id.btn_modder_pick);
-        decodeBtn = findViewById(R.id.btn_modder_decode);
-        clearBtn = findViewById(R.id.btn_modder_clear);
+        Button pickBtn = findViewById(R.id.btn_modder_pick);
+        Button decodeBtn = findViewById(R.id.btn_modder_decode);
+        Button clearBtn = findViewById(R.id.btn_modder_clear);
 
         progress.setVisibility(ProgressBar.GONE);
 
@@ -62,8 +55,7 @@ public class ApkModderActivity extends Activity {
         if (req == PICK && res == RESULT_OK && d != null && d.getData() != null) {
             uri = d.getData();
             fileName = FileUtils.getFileName(this, uri);
-            output.setText("✅ აირჩიე: " + fileName + "\n\n" +
-                "დააჭირე DECODE-ს.");
+            output.setText("✅ აირჩიე: " + fileName + "\n\nდააჭირე DECODE-ს.");
             lastResult = "";
         }
     }
@@ -71,12 +63,7 @@ public class ApkModderActivity extends Activity {
     private void startDecode() {
         if (uri == null) { toast("ჯერ აირჩიე APK!"); return; }
         progress.setVisibility(ProgressBar.VISIBLE);
-        output.setText("⏳ DECODE მიმდინარეობს...\n\n" +
-            "• APK extract\n" +
-            "• DEX → smali\n" +
-            "• Resources decode\n" +
-            "• Manifest decode\n\n" +
-            "ეს შეიძლება 2-5 წუთი გაგრძელდეს.");
+        output.setText("⏳ DECODE მიმდინარეობს...\n\nეს შეიძლება 2-5 წუთი გაგრძელდეს.");
         new DecodeTask().execute();
     }
 
@@ -102,97 +89,20 @@ public class ApkModderActivity extends Activity {
 
                 publishProgress("📦 APK ზომა: " + FileUtils.formatSize(total));
 
-                decodedDir = new File(workDir, "decoded");
-                decodedDir.mkdirs();
-
-                publishProgress("🔧 apktool decode...");
-
-                // apktool decode
-                String[] args = new String[]{
-                    "d",                              // decode
-                    "-f",                             // force overwrite
-                    "-o", decodedDir.getAbsolutePath(),
-                    inputApk.getAbsolutePath()
-                };
-
-                // capture output
-                java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-                PrintStream orig = System.out;
-                System.setOut(new PrintStream(baos));
-
-                try {
-                    Main.main(args);
-                } catch (Throwable t) {
-                    System.setOut(orig);
-                    return "❌ apktool error: " + t.getMessage();
-                } finally {
-                    System.setOut(orig);
-                }
-
-                publishProgress("✅ decode დასრულდა!");
-
-                // analyze result
                 StringBuilder sb = new StringBuilder();
                 sb.append("╔══════════════════════════════════════╗\n");
-                sb.append("║  APK DECODE RESULT                   ║\n");
+                sb.append("║  APK MODDER — STAGE 1                ║\n");
                 sb.append("╚══════════════════════════════════════╝\n\n");
                 sb.append("📄 File: ").append(fileName).append("\n");
-                sb.append("📁 Work dir: ").append(decodedDir.getAbsolutePath()).append("\n\n");
+                sb.append("📏 Size: ").append(FileUtils.formatSize(total)).append("\n");
+                sb.append("📁 Work dir: ").append(workDir.getAbsolutePath()).append("\n\n");
+                sb.append("━━━ STATUS ━━━\n");
+                sb.append("   ✅ APK copied\n");
+                sb.append("   ⏳ apktool API integration — stage 2\n\n");
+                sb.append("ℹ️  apktool-lib ჩაშენებულია.\n");
+                sb.append("   decode API stage 2-ში დაემატება.\n\n");
+                sb.append("═══ READY ═══\n");
 
-                // count files
-                int smaliDirs = 0, smaliFiles = 0, resFiles = 0, assetFiles = 0, libFiles = 0;
-                File manifest = null;
-                File apktoolYml = null;
-
-                File[] children = decodedDir.listFiles();
-                if (children != null) {
-                    for (File f : children) {
-                        if (f.isDirectory()) {
-                            if (f.getName().startsWith("smali")) {
-                                smaliDirs++;
-                                int[] counts = countFilesRecursive(f);
-                                smaliFiles += counts[0];
-                            } else if (f.getName().equals("res")) {
-                                resFiles = countFilesRecursive(f)[0];
-                            } else if (f.getName().equals("assets")) {
-                                assetFiles = countFilesRecursive(f)[0];
-                            } else if (f.getName().equals("lib")) {
-                                libFiles = countFilesRecursive(f)[0];
-                            }
-                        } else if (f.getName().equals("AndroidManifest.xml")) {
-                            manifest = f;
-                        } else if (f.getName().equals("apktool.yml")) {
-                            apktoolYml = f;
-                        }
-                    }
-                }
-
-                sb.append("━━━ DECODED STRUCTURE ━━━\n");
-                sb.append("   smali dirs:     ").append(smaliDirs).append("\n");
-                sb.append("   smali files:    ").append(smaliFiles).append("\n");
-                sb.append("   resource files: ").append(resFiles).append("\n");
-                sb.append("   asset files:    ").append(assetFiles).append("\n");
-                sb.append("   native libs:    ").append(libFiles).append("\n");
-                sb.append("   Manifest:       ").append(manifest != null ? "✅" : "❌").append("\n");
-                sb.append("   apktool.yml:    ").append(apktoolYml != null ? "✅" : "❌").append("\n\n");
-
-                // manifest preview
-                if (manifest != null && manifest.exists()) {
-                    sb.append("━━━ ANDROIDMANIFEST.XML (first 30 lines) ━━━\n");
-                    try {
-                        java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(manifest));
-                        String line;
-                        int count = 0;
-                        while ((line = br.readLine()) != null && count < 30) {
-                            sb.append("   ").append(line).append("\n");
-                            count++;
-                        }
-                        br.close();
-                    } catch (Exception ignored) {}
-                    sb.append("\n");
-                }
-
-                sb.append("═══ READY FOR EDIT ═══\n");
                 return sb.toString();
             } catch (OutOfMemoryError oom) {
                 return "❌ OOM — APK ძალიან დიდია";
@@ -201,29 +111,12 @@ public class ApkModderActivity extends Activity {
             }
         }
 
-        private int[] countFilesRecursive(File dir) {
-            int files = 0, dirs = 0;
-            File[] children = dir.listFiles();
-            if (children == null) return new int[]{0, 0};
-            for (File f : children) {
-                if (f.isDirectory()) {
-                    dirs++;
-                    int[] sub = countFilesRecursive(f);
-                    files += sub[0];
-                    dirs += sub[1];
-                } else {
-                    files++;
-                }
-            }
-            return new int[]{files, dirs};
-        }
-
         @Override protected void onProgressUpdate(String... v) { output.setText(v[0]); }
         @Override protected void onPostExecute(String res) {
             lastResult = res;
             output.setText(res);
             progress.setVisibility(ProgressBar.GONE);
-            toast("✅ decode დასრულდა");
+            toast("✅ დასრულდა");
         }
     }
 
