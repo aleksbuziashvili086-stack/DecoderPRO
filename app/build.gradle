@@ -56,7 +56,15 @@ android {
 }
 
 dependencies {
+    // APK decode/rebuild
     implementation 'org.apktool:apktool-lib:2.9.3'
+
+    // DEX parsing (JADX Decompiler module)
+    implementation 'org.smali:dexlib2:2.5.2'
+
+    // Guava (apktool + dexlib2)
     implementation 'com.google.guava:guava:31.1-android'
+
+    // MultiDex
     implementation 'com.android.support:multidex:1.0.3'
 }
