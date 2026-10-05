@@ -1,49 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/Theme.DecoderPRO"
-        android:requestLegacyExternalStorage="true"
-        android:largeHeap="true">
-        <activity android:name=".SplashActivity" android:exported="true"
-            android:theme="@style/Theme.DecoderPRO.Splash">
+        android:label="DecoderPRO"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
-        <activity android:name=".HomeActivity" android:exported="false" />
-        <activity android:name=".ScanResultsActivity" android:exported="false"
-            android:configChanges="orientation|screenSize|keyboardHidden" />
-        <activity android:name=".ApkModderActivity" android:exported="false"
-            android:configChanges="orientation|screenSize|keyboardHidden" />
-        <activity android:name=".DeepAnalysisActivity" android:exported="false"
-            android:configChanges="orientation|screenSize|keyboardHidden" />
-        <activity android:name=".FullAnalysisActivity" android:exported="false"
-            android:configChanges="orientation|screenSize|keyboardHidden" />
-        <activity android:name=".DecryptionActivity" android:exported="false"
-            android:configChanges="orientation|screenSize|keyboardHidden" />
-        <activity android:name=".DecoderActivity" android:exported="false" />
-        <activity android:name=".HashActivity" android:exported="false" />
-        <activity android:name=".EntropyActivity" android:exported="false" />
-        <activity android:name=".StringsActivity" android:exported="false" />
-        <activity android:name=".CipherActivity" android:exported="false" />
-        <activity android:name=".CryptoActivity" android:exported="false" />
-        <activity android:name=".FileAnalysisActivity" android:exported="false" />
-        <activity android:name=".FileCompareActivity" android:exported="false" />
-        <activity android:name=".HexViewerActivity" android:exported="false" />
-        <activity android:name=".ApkExplorerActivity" android:exported="false" />
-        <activity android:name=".ManifestActivity" android:exported="false" />
-        <activity android:name=".SignatureActivity" android:exported="false" />
-        <activity android:name=".DexActivity" android:exported="false" />
-        <activity android:name=".AssetsActivity" android:exported="false" />
-        <activity android:name=".NativeLibsActivity" android:exported="false" />
-        <activity android:name=".GameLabActivity" android:exported="false" />
-        <activity android:name=".DexDecompilerActivity" android:exported="false"
-            android:configChanges="orientation|screenSize|keyboardHidden" />
+
     </application>
+
 </manifest>
