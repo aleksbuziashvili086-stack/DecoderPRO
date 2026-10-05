@@ -1827,6 +1827,8 @@ public class MainActivity extends Activity {
 
 
 
+    private int dp(int value) { return (int)(value * getResources().getDisplayMetrics().density + 0.5f); }
+
     private void log(String message) {
         android.util.Log.d("DecoderPRO", message);
     }
