@@ -18,7 +18,8 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
         }
     }
 
@@ -49,27 +50,16 @@ android {
             ]
         }
     }
-
-    dexOptions {
-        javaMaxHeapSize "4g"
-    }
 }
 
 dependencies {
-    // APK decode/rebuild
     implementation 'org.apktool:apktool-lib:2.9.3'
-
-    // DEX parsing
     implementation 'org.smali:dexlib2:2.5.2'
-
-    // Guava
     implementation 'com.google.guava:guava:31.1-android'
 
-    // JADX
     implementation 'io.github.skylot:jadx-core:1.5.6'
     implementation 'io.github.skylot:jadx-dex-input:1.5.6'
     implementation 'io.github.skylot:jadx-java-input:1.5.6'
 
-    // MultiDex
     implementation 'com.android.support:multidex:1.0.3'
 }
