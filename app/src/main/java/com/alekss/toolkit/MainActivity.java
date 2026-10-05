@@ -1385,15 +1385,15 @@ public class MainActivity extends Activity {
             out.append("==============================\n");
             out.append(extractPrintableStrings(file));
 
-            codeArea.setText(out.toString());
-            codeArea.setSelection(0);
+            editorText.setText(out.toString());
+            editorText.setSelection(0);
 
-            currentFile = file;
+            openedLocalFile = null;
 
             log("Binary analyzer: " + file.getName());
 
         } catch (Exception e) {
-            codeArea.setText(
+            editorText.setText(
                     "BINARY ANALYZER ERROR\n\n" + e.getMessage()
             );
             log("Binary analyzer error: " + e.getMessage());
@@ -1673,7 +1673,7 @@ public class MainActivity extends Activity {
         query = query.trim();
 
         if (query.length() == 0) {
-            codeArea.setText(
+            editorText.setText(
                     "PROJECT SEARCH\n\nEnter a search term."
             );
             return;
@@ -1682,7 +1682,7 @@ public class MainActivity extends Activity {
         if (projectRoot == null ||
                 !projectRoot.exists()) {
 
-            codeArea.setText(
+            editorText.setText(
                     "PROJECT SEARCH\n\n" +
                     "Open a folder or ZIP project first."
             );
@@ -1716,8 +1716,8 @@ public class MainActivity extends Activity {
         if (matches[0] == 0)
             out.append("\nNo matches found.");
 
-        codeArea.setText(out.toString());
-        codeArea.setSelection(0);
+        editorText.setText(out.toString());
+        editorText.setSelection(0);
 
         log(
                 "Project search: " +
@@ -1821,5 +1821,10 @@ public class MainActivity extends Activity {
         }
     }
 
+
+
+    private void log(String message) {
+        android.util.Log.d("DecoderPRO", message);
+    }
 
 }
