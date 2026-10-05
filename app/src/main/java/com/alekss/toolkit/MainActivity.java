@@ -252,6 +252,10 @@ public class MainActivity extends Activity {
         // BOTTOM TOOLBAR
         LinearLayout bottom =
                 new LinearLayout(this);
+        bottom.setOrientation(LinearLayout.HORIZONTAL);
+        bottom.setGravity(Gravity.CENTER_VERTICAL);
+        bottom.setPadding(8, 6, 8, 6);
+        bottom.setMinimumHeight(dp(60));
 
         bottom.setBackgroundColor(
                 Color.rgb(30,30,30)
@@ -266,7 +270,7 @@ public class MainActivity extends Activity {
         bottom.addView(
                 search,
                 new LinearLayout.LayoutParams(
-                        0, 52, 1
+                        0, dp(48), 1f
                 )
         );
 
@@ -282,7 +286,7 @@ public class MainActivity extends Activity {
         bottom.addView(
                 problems,
                 new LinearLayout.LayoutParams(
-                        0, 52, 1
+                        0, dp(48), 1f
                 )
         );
 
@@ -298,7 +302,7 @@ public class MainActivity extends Activity {
         bottom.addView(
                 logs,
                 new LinearLayout.LayoutParams(
-                        0, 52, 1
+                        0, dp(48), 1f
                 )
         );
 
