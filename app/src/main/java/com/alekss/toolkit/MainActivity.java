@@ -17,6 +17,11 @@ import java.util.*;
 import java.util.zip.*;
 
 import java.security.MessageDigest;
+
+import jadx.api.JadxArgs;
+import jadx.api.JadxDecompiler;
+import jadx.api.JavaClass;
+
 public class MainActivity extends Activity {
 
     private static final int PICK_FILE = 1001;
@@ -890,7 +895,15 @@ public class MainActivity extends Activity {
     // =========================
 
     private void openLocalFile(File file) {
-        if (file != null && !isTextName(file.getName())) {
+        if (file == null)
+            return;
+
+        if (isDecompilerFile(file.getName())) {
+            openDecompiledFile(file);
+            return;
+        }
+
+        if (!isTextName(file.getName())) {
             openBinaryAnalyzer(file);
             return;
         }
@@ -961,6 +974,235 @@ public class MainActivity extends Activity {
                     e.getMessage()
             );
         }
+    }
+
+    // =========================================================
+    // DECODERPRO - JADX DECOMPILER
+    // =========================================================
+
+    private boolean isDecompilerFile(String name) {
+        if (name == null)
+            return false;
+
+        String n = name.toLowerCase(Locale.US);
+
+        return n.endsWith(".class") ||
+               n.endsWith(".dex") ||
+               n.endsWith(".apk") ||
+               n.endsWith(".jar") ||
+               n.endsWith(".aar") ||
+               n.endsWith(".aab") ||
+               n.endsWith(".smali");
+    }
+
+    private void openDecompiledFile(File file) {
+        if (file == null)
+            return;
+
+        if (android.os.Build.VERSION.SDK_INT < 26) {
+            editorTitle.setText(file.getName());
+            editorText.setText(
+                    "JADX DECOMPILER\n\n" +
+                    "Android 8.0 (API 26) or newer is required."
+            );
+            return;
+        }
+
+        editorTitle.setText(
+                file.getName() + " [DECOMPILING...]"
+        );
+
+        editorText.setText(
+                "DECODERPRO DECOMPILER\n\n" +
+                "Loading: " + file.getName() +
+                "\n\nPlease wait..."
+        );
+
+        new Thread(() -> {
+            try {
+                JadxArgs args = new JadxArgs();
+                args.setInputFile(file);
+
+                StringBuilder result =
+                        new StringBuilder();
+
+                try (JadxDecompiler jadx =
+                             new JadxDecompiler(args)) {
+
+                    jadx.load();
+
+                    for (JavaClass cls :
+                            jadx.getClasses()) {
+
+                        result.append(
+                                cls.getCode()
+                        );
+
+                        result.append(
+                                "\n\n"
+                        );
+                    }
+                }
+
+                if (result.length() == 0) {
+                    result.append(
+                            "// JADX produced no Java source.\n"
+                    );
+                    result.append(
+                            "// The file may contain unsupported or heavily obfuscated code."
+                    );
+                }
+
+                final String output =
+                        result.toString();
+
+                runOnUiThread(() -> {
+                    editorTitle.setText(
+                            file.getName() +
+                            " [DECOMPILED]"
+                    );
+
+                    editorText.setText(output);
+                    editorText.setSelection(0);
+
+                    openedLocalFile = null;
+                    openedSafFile = null;
+                    safEditing = false;
+
+                    updateLineNumbers();
+
+                    log(
+                            "Decompiled: " +
+                            file.getName()
+                    );
+                });
+
+            } catch (Throwable e) {
+
+                final String message =
+                        e.getClass().getSimpleName() +
+                        ": " +
+                        String.valueOf(
+                                e.getMessage()
+                        );
+
+                runOnUiThread(() -> {
+                    editorTitle.setText(
+                            file.getName() +
+                            " [DECOMPILER ERROR]"
+                    );
+
+                    editorText.setText(
+                            "JADX DECOMPILER ERROR\n\n" +
+                            message +
+                            "\n\n" +
+                            "The original binary analyzer is still available."
+                    );
+
+                    updateLineNumbers();
+
+                    log(
+                            "Decompiler error: " +
+                            message
+                    );
+                });
+            }
+        }).start();
+    }
+
+    private void openSafDecompiledFile(
+            Uri uri,
+            String name) {
+
+        if (android.os.Build.VERSION.SDK_INT < 26) {
+            editorTitle.setText(name);
+            editorText.setText(
+                    "JADX DECOMPILER\n\n" +
+                    "Android 8.0 (API 26) or newer is required."
+            );
+            return;
+        }
+
+        editorTitle.setText(
+                name + " [LOADING...]"
+        );
+
+        editorText.setText(
+                "DECODERPRO DECOMPILER\n\n" +
+                "Copying file from storage..."
+        );
+
+        new Thread(() -> {
+            File temp = null;
+
+            try {
+                String safe =
+                        name.replaceAll(
+                                "[^a-zA-Z0-9._-]",
+                                "_"
+                        );
+
+                temp = new File(
+                        getCacheDir(),
+                        "decode_" +
+                        System.currentTimeMillis() +
+                        "_" +
+                        safe
+                );
+
+                InputStream in =
+                        getContentResolver()
+                                .openInputStream(uri);
+
+                if (in == null)
+                    throw new IOException(
+                            "Cannot open selected file"
+                    );
+
+                FileOutputStream out =
+                        new FileOutputStream(temp);
+
+                byte[] buffer =
+                        new byte[8192];
+
+                int n;
+
+                while ((n = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, n);
+                }
+
+                in.close();
+                out.close();
+
+                File finalFile = temp;
+
+                runOnUiThread(() ->
+                        openDecompiledFile(finalFile)
+                );
+
+            } catch (Throwable e) {
+
+                final String message =
+                        e.getClass().getSimpleName() +
+                        ": " +
+                        String.valueOf(
+                                e.getMessage()
+                        );
+
+                runOnUiThread(() -> {
+                    editorTitle.setText(
+                            name + " [ERROR]"
+                    );
+
+                    editorText.setText(
+                            "DECOMPILER ERROR\n\n" +
+                            message
+                    );
+
+                    updateLineNumbers();
+                });
+            }
+        }).start();
     }
 
     // =========================

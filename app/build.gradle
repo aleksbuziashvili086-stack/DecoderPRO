@@ -64,6 +64,11 @@ dependencies {
 
     // Guava (apktool + dexlib2)
     implementation 'com.google.guava:guava:31.1-android'
+    implementation 'io.github.skylot:jadx-core:1.5.6'
+    implementation 'io.github.skylot:jadx-dex-input:1.5.6'
+    implementation 'io.github.skylot:jadx-java-input:1.5.6'
+    implementation 'io.github.skylot:jadx-smali-input:1.5.6'
+    implementation 'io.github.skylot:jadx-kotlin-metadata:1.5.6'
 
     // MultiDex
     implementation 'com.android.support:multidex:1.0.3'
