@@ -7,13 +7,10 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -28,17 +25,13 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        AppCompatDelegate.setDefaultNightMode(
-            Prefs.dark(this) ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
-        );
+        AppCompatDelegate.setDefaultNightMode(Prefs.dark(this) ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-
         mode = Mode.find(getIntent().getStringExtra("mode"));
         String existing = getIntent().getStringExtra("chat_id");
         if (existing != null) chat = HistoryStore.open(this, existing);
         if (chat == null) chat = HistoryStore.create(this, mode.id, mode.title);
-
         TextView title = findViewById(R.id.chat_title);
         title.setText(mode.title);
         messages = findViewById(R.id.messages);
@@ -46,7 +39,6 @@ public class ChatActivity extends AppCompatActivity {
         input = findViewById(R.id.chat_input);
         findViewById(R.id.chat_back).setOnClickListener(v -> finish());
         findViewById(R.id.chat_send).setOnClickListener(v -> send(input.getText().toString()));
-
         renderAll();
         String seed = getIntent().getStringExtra("seed");
         if (seed != null && chat.messages.length() == 0) send(seed);
@@ -72,11 +64,16 @@ public class ChatActivity extends AppCompatActivity {
         addBubble("ვწერ…", false);
         busy = true;
         final JSONArray snapshot = copy(chat.messages);
-        final String system = PromptLibrary.system(Prefs.tone(this), mode);
+        final String task = mode.id;
+        final String instruction = PromptLibrary.system(Prefs.tone(this), mode);
+        final String chatId = chat.id;
+        final boolean useBackend = Prefs.backend(this) != null && !Prefs.backend(this).trim().isEmpty();
         final String key = Prefs.apiKey(this);
         final String model = Prefs.model(this);
         new Thread(() -> {
-            AiClient.Result result = AiClient.ask(key, model, system, snapshot);
+            AiClient.Result result = useBackend
+                ? BackendClient.chat(this, task, chatId, instruction, snapshot, "", null)
+                : AiClient.ask(key, model, instruction, snapshot);
             runOnUiThread(() -> {
                 if (isFinishing()) return;
                 busy = false;
@@ -121,8 +118,7 @@ public class ChatActivity extends AppCompatActivity {
         bubble.setPadding(28, 22, 28, 22);
         bubble.setBackgroundResource(R.drawable.bg_card);
         if (user) bubble.setBackgroundColor(0xFF2A3F72);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         params.gravity = user ? Gravity.END : Gravity.START;
         params.setMargins(user ? 48 : 0, 8, user ? 0 : 48, 8);
         bubble.setLayoutParams(params);
@@ -147,10 +143,6 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private JSONArray copy(JSONArray source) {
-        try {
-            return new JSONArray(source.toString());
-        } catch (Exception e) {
-            return new JSONArray();
-        }
+        try { return new JSONArray(source.toString()); } catch (Exception e) { return new JSONArray(); }
     }
 }

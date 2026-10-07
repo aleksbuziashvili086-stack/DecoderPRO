@@ -1,7 +1,6 @@
 package com.alekss.kartveli;
 
 import android.content.Context;
-import android.util.Base64;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.BufferedReader;
@@ -15,26 +14,37 @@ import java.nio.charset.StandardCharsets;
 public final class BackendClient {
     private BackendClient() {}
 
-    public static AiClient.Result chat(Context context, String task, JSONArray messages, String attachment, byte[] image) {
+    public static AiClient.Result chat(Context context, String task, String chatId, String instruction, JSONArray messages, String attachment, String imageB64) {
         String base = Prefs.backend(context);
-        if (base == null || base.isEmpty()) {
-            return AiClient.ask(Prefs.apiKey(context), Prefs.model(context), PromptLibrary.system(Prefs.tone(context), Mode.find(task)), messages);
+        if (base == null || base.trim().isEmpty()) {
+            return new AiClient.Result(false, "ბექენდის მისამართი ცარიელია. ჩაწერე პარამეტრებში.");
         }
         try {
             JSONObject body = new JSONObject();
             body.put("user_id", "local");
-            body.put("chat_id", "phone");
-            body.put("task", task);
+            body.put("chat_id", chatId == null ? "phone" : chatId);
+            body.put("task", task == null ? "free" : task);
             body.put("tone", Prefs.tone(context));
+            body.put("instruction", instruction == null ? "" : instruction);
             body.put("messages", messages);
             body.put("attachment", attachment == null ? "" : attachment);
-            if (image != null) body.put("image_b64", Base64.encodeToString(image, Base64.NO_WRAP));
-            String raw = post(base + "/v1/chat", body.toString(), Prefs.token(context));
+            body.put("pro", Prefs.pro(context));
+            if (imageB64 != null) body.put("image_b64", imageB64);
+            String raw = post(trim(base) + "/v1/chat", body.toString(), Prefs.token(context));
             JSONObject json = new JSONObject(raw);
-            return new AiClient.Result(true, json.optString("text", "ცარიელი პასუხი"));
+            if (json.optBoolean("ok", true) && !json.optString("text").isEmpty()) {
+                return new AiClient.Result(true, json.optString("text"));
+            }
+            String error = json.optString("error", json.optString("text", "ცარიელი პასუხი"));
+            return new AiClient.Result(false, error);
         } catch (Exception e) {
-            return new AiClient.Result(false, "ბექენდი ვერ ვიპოვე. " + e.getMessage());
+            return new AiClient.Result(false, "დაფიქსირდა ტექნიკური შეცდომა. გთხოვ, თავიდან სცადე.");
         }
+    }
+
+    private static String trim(String base) {
+        String value = base.trim();
+        return value.endsWith("/") ? value.substring(0, value.length() - 1) : value;
     }
 
     private static String post(String url, String json, String token) throws Exception {
@@ -54,7 +64,7 @@ public final class BackendClient {
         String line;
         while ((line = reader.readLine()) != null) text.append(line);
         reader.close();
-        if (conn.getResponseCode() >= 400) throw new Exception(text.toString());
+        if (conn.getResponseCode() >= 400) throw new Exception("http");
         return text.toString();
     }
 }

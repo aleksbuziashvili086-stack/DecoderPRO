@@ -18,14 +18,12 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         findViewById(R.id.settings_back).setOnClickListener(v -> finish());
-        EditText key = findViewById(R.id.api_key);
-        EditText model = findViewById(R.id.model_name);
+        EditText backend = findViewById(R.id.backend_url);
+        EditText token = findViewById(R.id.backend_token);
         Spinner tone = findViewById(R.id.tone_spinner);
         Switch dark = findViewById(R.id.dark_switch);
-        key.setHint("ბექენდის მისამართი, მაგ. http://10.0.2.2:8000");
-        model.setHint("ბექენდის ტოკენი");
-        key.setText(Prefs.backend(this));
-        model.setText(Prefs.token(contextToken()));
+        backend.setText(Prefs.backend(this));
+        token.setText(Prefs.token(this));
         dark.setChecked(Prefs.dark(this));
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, TONES);
         tone.setAdapter(adapter);
@@ -33,8 +31,8 @@ public class SettingsActivity extends AppCompatActivity {
         for (int i = 0; i < TONES.length; i++) if (TONES[i].equals(savedTone)) tone.setSelection(i);
         findViewById(R.id.save_settings).setOnClickListener(v -> {
             Prefs.of(this).edit()
-                .putString(Prefs.KEY_BACKEND, key.getText().toString().trim())
-                .putString(Prefs.KEY_TOKEN, model.getText().toString().trim())
+                .putString(Prefs.KEY_BACKEND, backend.getText().toString().trim())
+                .putString(Prefs.KEY_TOKEN, token.getText().toString().trim())
                 .putString(Prefs.KEY_TONE, String.valueOf(tone.getSelectedItem()))
                 .putBoolean(Prefs.KEY_DARK, dark.isChecked())
                 .apply();
@@ -46,6 +44,4 @@ public class SettingsActivity extends AppCompatActivity {
             Toast.makeText(this, "ისტორია წაიშალა", Toast.LENGTH_SHORT).show();
         });
     }
-
-    private String contextToken() { return Prefs.token(this); }
 }
