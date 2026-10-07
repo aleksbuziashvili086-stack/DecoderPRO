@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/settings_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="12dp"
+            android:text="უკან"
+            android:textColor="@color/accent_2"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="პარამეტრები"
+            android:textColor="@color/text"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="გასაღები მხოლოდ ტელეფონზე ინახება. აიღე უფასოდ Google AI Studio-დან."
+            android:textColor="@color/muted"
+            android:textSize="13sp" />
+
+        <EditText
+            android:id="@+id/api_key"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_input"
+            android:hint="Gemini API გასაღები"
+            android:importantForAutofill="no"
+            android:inputType="textPassword"
+            android:padding="14dp"
+            android:textColor="@color/text"
+            android:textColorHint="@color/muted" />
+
+        <EditText
+            android:id="@+id/model_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_input"
+            android:hint="მოდელი"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:padding="14dp"
+            android:textColor="@color/text"
+            android:textColorHint="@color/muted" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="ტონი"
+            android:textColor="@color/text"
+            android:textSize="16sp" />
+
+        <Spinner
+            android:id="@+id/tone_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_input"
+            android:padding="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="მუქი რეჟიმი"
+                android:textColor="@color/text"
+                android:textSize="16sp" />
+
+            <Switch
+                android:id="@+id/dark_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/save_settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_send"
+            android:gravity="center"
+            android:padding="14dp"
+            android:text="შენახვა"
+            android:textColor="@color/text"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/clear_history"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:padding="14dp"
+            android:text="ისტორიის წაშლა"
+            android:textColor="@color/danger" />
+    </LinearLayout>
+</ScrollView>
