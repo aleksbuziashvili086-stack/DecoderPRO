@@ -12,4 +12,5 @@
     <color name="ai_bubble">#1A243C</color>
     <color name="danger">#FF6B7A</color>
     <color name="line">#2A3554</color>
+    <color name="bg_dark">#0B1020</color>
 </resources>
