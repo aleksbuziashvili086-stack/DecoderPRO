@@ -8,6 +8,8 @@ import android.widget.Switch;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import com.alekss.kartveli.data.MemoryRepository;
+import com.alekss.kartveli.data.SecurePrefs;
 
 public class SettingsActivity extends AppCompatActivity {
     private static final String[] TONES = {"მეგობრული", "ოფიციალური", "მოკლე", "მასწავლებელი"};
@@ -22,7 +24,7 @@ public class SettingsActivity extends AppCompatActivity {
         EditText model = findViewById(R.id.model_name);
         Spinner tone = findViewById(R.id.tone_spinner);
         Switch dark = findViewById(R.id.dark_switch);
-        key.setText(Prefs.apiKey(this));
+        key.setText(SecurePrefs.apiKey(this));
         model.setText(Prefs.model(this));
         dark.setChecked(Prefs.dark(this));
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, TONES);
@@ -30,11 +32,12 @@ public class SettingsActivity extends AppCompatActivity {
         String savedTone = Prefs.tone(this);
         for (int i = 0; i < TONES.length; i++) if (TONES[i].equals(savedTone)) tone.setSelection(i);
         findViewById(R.id.save_settings).setOnClickListener(v -> {
+            SecurePrefs.saveApiKey(this, key.getText().toString().trim());
             Prefs.of(this).edit()
-                .putString(Prefs.KEY_API, key.getText().toString().trim())
                 .putString(Prefs.KEY_MODEL, model.getText().toString().trim())
                 .putString(Prefs.KEY_TONE, String.valueOf(tone.getSelectedItem()))
                 .putBoolean(Prefs.KEY_DARK, dark.isChecked())
+                .putBoolean("memory_on", true)
                 .apply();
             AppCompatDelegate.setDefaultNightMode(dark.isChecked() ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
             Toast.makeText(this, "შენახულია", Toast.LENGTH_SHORT).show();
@@ -44,7 +47,7 @@ public class SettingsActivity extends AppCompatActivity {
             Toast.makeText(this, "ისტორია წაიშალა", Toast.LENGTH_SHORT).show();
         });
         findViewById(R.id.clear_memory).setOnClickListener(v -> {
-            Prefs.of(this).edit().remove("memory").apply();
+            MemoryRepository.clear(this);
             Toast.makeText(this, "მეხსიერება წაიშალა", Toast.LENGTH_SHORT).show();
         });
     }
