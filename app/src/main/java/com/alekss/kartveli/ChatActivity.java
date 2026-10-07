@@ -15,13 +15,15 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import com.alekss.kartveli.ai.AIOrchestrator;
+import com.alekss.kartveli.ai.AIProvider;
+import com.alekss.kartveli.data.MemoryRepository;
+import com.alekss.kartveli.files.LocalFileReader;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Locale;
 
 public class ChatActivity extends AppCompatActivity {
@@ -46,18 +48,22 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
         filePicker = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
             if (uri == null) return;
-            pendingFile = readText(uri);
-            Toast.makeText(this, pendingFile.startsWith("ამ ფაილს") ? pendingFile : "ფაილი მზად არის. დაწერე რა გინდა იცოდე.", Toast.LENGTH_SHORT).show();
+            try {
+                InputStream in = getContentResolver().openInputStream(uri);
+                String name = String.valueOf(uri.getLastPathSegment());
+                pendingFile = name.endsWith(".zip") ? LocalFileReader.readZip(in) : LocalFileReader.readText(in);
+                Toast.makeText(this, "ფაილი მზად არის", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Toast.makeText(this, "ფაილი ვერ გაიხსნა", Toast.LENGTH_SHORT).show();
+            }
         });
         imagePicker = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
             if (uri == null) return;
             pendingImage = readBase64(uri);
             pendingMime = getContentResolver().getType(uri);
-            Toast.makeText(this, pendingImage == null ? "სურათი ვერ წავიკითხე" : "სურათი მზად არის. დაწერე რა გინდა იცოდე.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, pendingImage == null ? "სურათი ვერ წავიკითხე" : "სურათი მზად არის", Toast.LENGTH_SHORT).show();
         });
-        tts = new TextToSpeech(this, status -> {
-            if (status == TextToSpeech.SUCCESS) tts.setLanguage(new Locale("ka", "GE"));
-        });
+        tts = new TextToSpeech(this, status -> { if (status == TextToSpeech.SUCCESS) tts.setLanguage(new Locale("ka", "GE")); });
         mode = Mode.find(getIntent().getStringExtra("mode"));
         String existing = getIntent().getStringExtra("chat_id");
         if (existing != null) chat = HistoryStore.open(this, existing);
@@ -72,17 +78,14 @@ public class ChatActivity extends AppCompatActivity {
         findViewById(R.id.chat_image).setOnClickListener(v -> imagePicker.launch("image/*"));
         findViewById(R.id.chat_voice).setOnClickListener(v -> startVoice());
         renderAll();
-        String seed = getIntent().getStringExtra("seed");
-        if (seed != null && chat.messages.length() == 0) send(seed);
     }
 
     private void startVoice() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ka-GE");
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "ილაპარაკე ქართულად");
         try { startActivityForResult(intent, VOICE); }
-        catch (Exception e) { Toast.makeText(this, "ამ ტელეფონზე ქართული ხმა არ დგას", Toast.LENGTH_SHORT).show(); }
+        catch (Exception e) { Toast.makeText(this, "ქართული ხმა ამ ტელეფონზე არ დგას", Toast.LENGTH_SHORT).show(); }
     }
 
     @Override
@@ -98,20 +101,14 @@ public class ChatActivity extends AppCompatActivity {
         String text = raw == null ? "" : raw.trim();
         if ((text.isEmpty() && pendingFile.isEmpty() && pendingImage == null) || busy) return;
         if (text.startsWith("დაიმახსოვრე")) {
-            String fact = text.replaceFirst("დაიმახსოვრე", "").trim();
-            String old = Prefs.of(this).getString("memory", "");
-            Prefs.of(this).edit().putString("memory", (old + "\n" + fact).trim()).apply();
-            addBubble("დავიმახსოვრე: " + fact, false);
+            MemoryRepository.add(this, text.replaceFirst("დაიმახსოვრე", "").trim(), "PREFERENCE");
+            addBubble("დავიმახსოვრე", false);
             input.setText("");
-            return;
-        }
-        if (!allowSend()) {
-            Toast.makeText(this, "დღევანდელი 20 უფასო პასუხი ამოიწურა.", Toast.LENGTH_LONG).show();
             return;
         }
         String shown = text.isEmpty() ? "ფაილი ან სურათი" : text;
         input.setText("");
-        appendMessage("user", shown);
+        appendMessage("user", shown + (pendingFile.isEmpty() ? "" : "\n\nფაილი:\n" + pendingFile));
         addBubble(shown, true);
         addBubble("ვწერ…", false);
         busy = true;
@@ -121,14 +118,8 @@ public class ChatActivity extends AppCompatActivity {
         pendingFile = "";
         pendingImage = null;
         final JSONArray snapshot = copy(chat.messages);
-        if (!file.isEmpty()) {
-            try { snapshot.getJSONObject(snapshot.length() - 1).put("text", shown + "\n\nფაილის ტექსტი:\n" + file); } catch (Exception ignored) {}
-        }
-        final String system = PromptLibrary.system(Prefs.tone(this), mode) + "\nდამახსოვრებული: " + Prefs.of(this).getString("memory", "");
-        final String key = Prefs.apiKey(this);
-        final String modelName = Prefs.model(this);
         new Thread(() -> {
-            AiClient.Result result = AiClient.ask(key, modelName, system, snapshot, image, mime);
+            AIProvider.Result result = AIOrchestrator.send(this, mode, shown, snapshot, file, image, mime);
             runOnUiThread(() -> {
                 if (isFinishing()) return;
                 busy = false;
@@ -136,7 +127,6 @@ public class ChatActivity extends AppCompatActivity {
                 addBubble(result.text, false);
                 if (result.ok) {
                     appendMessage("assistant", result.text);
-                    bumpCount();
                     if (tts != null) tts.speak(result.text, TextToSpeech.QUEUE_FLUSH, null, "kartveli");
                 }
                 HistoryStore.save(this, chat);
@@ -144,34 +134,16 @@ public class ChatActivity extends AppCompatActivity {
         }).start();
     }
 
-    private String readText(android.net.Uri uri) {
-        try {
-            InputStream in = getContentResolver().openInputStream(uri);
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            byte[] buf = new byte[4096];
-            int n;
-            int total = 0;
-            while ((n = in.read(buf)) > 0 && total < 20000) { out.write(buf, 0, n); total += n; }
-            in.close();
-            return out.toString("UTF-8");
-        } catch (Exception e) {
-            return "ამ ფაილს ვერ ვკითხულობ. TXT, კოდი ან MD სცადე.";
-        }
-    }
-
     private String readBase64(android.net.Uri uri) {
         try {
             InputStream in = getContentResolver().openInputStream(uri);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             byte[] buf = new byte[4096];
-            int n;
-            int total = 0;
-            while ((n = in.read(buf)) > 0 && total < 1500000) { out.write(buf, 0, n); total += n; }
+            int n; int total = 0;
+            while ((n = in.read(buf)) > 0 && total < 1200000) { out.write(buf, 0, n); total += n; }
             in.close();
             return Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP);
-        } catch (Exception e) {
-            return null;
-        }
+        } catch (Exception e) { return null; }
     }
 
     private void appendMessage(String role, String text) {
@@ -199,28 +171,13 @@ public class ChatActivity extends AppCompatActivity {
         bubble.setPadding(28, 22, 28, 22);
         bubble.setBackgroundResource(R.drawable.bg_card);
         if (user) bubble.setBackgroundColor(0xFF2A3F72);
+        if (text.contains("```")) bubble.setTypeface(android.graphics.Typeface.MONOSPACE);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         params.gravity = user ? Gravity.END : Gravity.START;
         params.setMargins(user ? 48 : 0, 8, user ? 0 : 48, 8);
         bubble.setLayoutParams(params);
         messages.addView(bubble);
         scroll.post(() -> scroll.fullScroll(ScrollView.FOCUS_DOWN));
-    }
-
-    private boolean allowSend() {
-        if (Prefs.pro(this)) return true;
-        String today = new SimpleDateFormat("yyyyMMdd", Locale.US).format(new Date());
-        String saved = Prefs.of(this).getString(Prefs.KEY_DAY, "");
-        int count = today.equals(saved) ? Prefs.of(this).getInt(Prefs.KEY_COUNT, 0) : 0;
-        return count < 20;
-    }
-
-    private void bumpCount() {
-        if (Prefs.pro(this)) return;
-        String today = new SimpleDateFormat("yyyyMMdd", Locale.US).format(new Date());
-        String saved = Prefs.of(this).getString(Prefs.KEY_DAY, "");
-        int count = today.equals(saved) ? Prefs.of(this).getInt(Prefs.KEY_COUNT, 0) : 0;
-        Prefs.of(this).edit().putString(Prefs.KEY_DAY, today).putInt(Prefs.KEY_COUNT, count + 1).apply();
     }
 
     private JSONArray copy(JSONArray source) {
